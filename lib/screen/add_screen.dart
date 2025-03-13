@@ -127,11 +127,11 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
               title: "Week start from",
               items: const ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
               onChanged: (value) {
+                activeDays.clear();
                 setState(() {
                   selectedWeekDay = value;
                   selectedDaysPerWeek = "7";
                   activeDaysController.text = "7";
-                  activeDays.clear();
                   selectedWeekIndex = AppConstants.selectedWeekIndex(value);
                 });
               },
@@ -634,12 +634,12 @@ class UpdateTabIndex extends IconEvent {
 class SelectStreakActiveDays extends StatefulWidget {
   final Function(String days) onDaysSelected;
   final int selectedWeekDayIndex;
-  final List<int> activeDays;
+  final List<int>? activeDays;
   const SelectStreakActiveDays({
     super.key,
     required this.onDaysSelected,
     this.selectedWeekDayIndex = 0,
-    this.activeDays = const [],
+    this.activeDays,
   });
 
   @override
@@ -672,15 +672,17 @@ class _SelectStreakActiveDaysState extends State<SelectStreakActiveDays> {
                     width: 50.0,
                     height: 50.0,
                     decoration: BoxDecoration(
-                      color: widget.activeDays.contains(
-                        AppConstants.selectedDayIndex(days),
-                      )
+                      color: (widget.activeDays?.contains(
+                                AppConstants.selectedDayIndex(days),
+                              ) ??
+                              false)
                           ? AppColors.primaryColor
                           : AppColors.blackColor,
                       borderRadius: BorderRadius.circular(5.0),
-                      border: !widget.activeDays.contains(
-                        AppConstants.selectedDayIndex(days),
-                      )
+                      border: !(widget.activeDays?.contains(
+                                AppConstants.selectedDayIndex(days),
+                              ) ??
+                              false)
                           ? Border.all(
                               color: FlexColor.greyDarkSecondary,
                             )
