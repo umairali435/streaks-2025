@@ -9,10 +9,27 @@ import 'package:streaks/res/constants.dart';
 import 'package:streaks/database/streaks_database.dart';
 import 'package:streaks/screen/add_screen.dart';
 
-class StreakDetailScreen extends StatelessWidget {
+class StreakDetailScreen extends StatefulWidget {
   final Streak streak;
 
   const StreakDetailScreen({super.key, required this.streak});
+
+  @override
+  State<StreakDetailScreen> createState() => _StreakDetailScreenState();
+}
+
+class _StreakDetailScreenState extends State<StreakDetailScreen> {
+  List<DateTime> allDates = [];
+  List<DateTime> getAllDatesOfCurrentYear() {
+    int year = DateTime.now().year;
+    DateTime startDate = DateTime(year, 1, 1);
+    DateTime endDate = DateTime(year, 12, 31);
+
+    return List.generate(
+      endDate.difference(startDate).inDays + 1,
+      (index) => startDate.add(Duration(days: index)),
+    );
+  }
 
   int calculateLongestStreak(List<DateTime> streakDates) {
     if (streakDates.isEmpty) return 0;
@@ -36,8 +53,15 @@ class StreakDetailScreen extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    allDates = getAllDatesOfCurrentYear();
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    int longestStreak = calculateLongestStreak(streak.streakDates);
+    int longestStreak = calculateLongestStreak(widget.streak.streakDates);
 
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +76,7 @@ class StreakDetailScreen extends StatelessWidget {
           },
         ),
         title: Text(
-          streak.name,
+          widget.streak.name,
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w900,
             color: AppColors.whiteColor,
@@ -69,7 +93,7 @@ class StreakDetailScreen extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => AddStrekScreen(
-                    streak: streak,
+                    streak: widget.streak,
                   ),
                 ),
               );
@@ -81,7 +105,8 @@ class StreakDetailScreen extends StatelessWidget {
               color: AppColors.whiteColor,
             ),
             onPressed: () async {
-              await StreaksDatabase.deleteStreakById(streak.id).then((_) {
+              await StreaksDatabase.deleteStreakById(widget.streak.id)
+                  .then((_) {
                 context.read<StreaksBloc>().add(LoadStreaks());
                 Navigator.of(context).pop();
               });
@@ -104,7 +129,8 @@ class StreakDetailScreen extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: AppColors.whiteColor,
-                            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                            borderRadius: BorderRadius.circular(
+                                AppConstants.borderRadius),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -116,7 +142,7 @@ class StreakDetailScreen extends StatelessWidget {
                                   "Current Streak",
                                   style: GoogleFonts.poppins(
                                     fontWeight: FontWeight.w900,
-                                    color: Color(streak.colorCode),
+                                    color: Color(widget.streak.colorCode),
                                     fontSize: 16.0,
                                   ),
                                 ),
@@ -125,10 +151,10 @@ class StreakDetailScreen extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    streak.streakDates.length.toString(),
+                                    widget.streak.streakDates.length.toString(),
                                     style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w900,
-                                      color: Color(streak.colorCode),
+                                      color: Color(widget.streak.colorCode),
                                       fontSize: 45.0,
                                     ),
                                   ),
@@ -143,7 +169,8 @@ class StreakDetailScreen extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: AppColors.whiteColor,
-                            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                            borderRadius: BorderRadius.circular(
+                                AppConstants.borderRadius),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -155,7 +182,7 @@ class StreakDetailScreen extends StatelessWidget {
                                   "Longest Streak",
                                   style: GoogleFonts.poppins(
                                     fontWeight: FontWeight.w900,
-                                    color: Color(streak.colorCode),
+                                    color: Color(widget.streak.colorCode),
                                     fontSize: 16.0,
                                   ),
                                 ),
@@ -167,7 +194,7 @@ class StreakDetailScreen extends StatelessWidget {
                                     longestStreak.toString(),
                                     style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w900,
-                                      color: Color(streak.colorCode),
+                                      color: Color(widget.streak.colorCode),
                                       fontSize: 45.0,
                                     ),
                                   ),
@@ -183,7 +210,8 @@ class StreakDetailScreen extends StatelessWidget {
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.whiteColor,
-                      borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.borderRadius),
                     ),
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -193,22 +221,31 @@ class StreakDetailScreen extends StatelessWidget {
                           "365 Days",
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w900,
-                            color: Color(streak.colorCode),
+                            color: Color(widget.streak.colorCode),
                             fontSize: 18.0,
                           ),
                         ),
                         const Gap(10.0),
                         GridView.builder(
                           shrinkWrap: true,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 23),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 23),
                           itemCount: 365,
                           itemBuilder: (context, index) {
-                            DateTime date = DateTime.now().add(Duration(days: index));
-                            bool isStreakDay = streak.streakDates.contains(DateTime(date.year, date.month, date.day));
+                            List<DateTime> dates = allDates;
+                            DateTime date = dates[index];
+                            bool isStreakDay = widget.streak.streakDates
+                                .map((date) =>
+                                    DateTime(date.year, date.month, date.day))
+                                .contains(
+                                    DateTime(date.year, date.month, date.day));
                             return Container(
                               margin: const EdgeInsets.all(2.0),
                               decoration: BoxDecoration(
-                                color: isStreakDay ? Color(streak.colorCode) : AppColors.greyColor,
+                                color: isStreakDay
+                                    ? Color(widget.streak.colorCode)
+                                    : AppColors.greyColor,
                                 borderRadius: BorderRadius.circular(2.0),
                               ),
                             );

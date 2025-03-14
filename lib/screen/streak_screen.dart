@@ -41,9 +41,9 @@ class _StreakScreenState extends State<StreakScreen> {
           ),
           onSelected: (value) async {
             if (value == 'privacy_policy') {
-              await UrlLauncherService.launchUrl(AppText.privacyPolicy);
+              await UrlLauncherService.launchURL(AppText.privacyPolicy);
             } else if (value == 'support') {
-              await UrlLauncherService.launchUrl(AppText.support);
+              await UrlLauncherService.launchURL(AppText.support);
             }
           },
           itemBuilder: (BuildContext context) {
@@ -92,7 +92,8 @@ class _StreakScreenState extends State<StreakScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(LucideIcons.flame, size: 100.0, color: AppColors.whiteColor),
+                      Icon(LucideIcons.flame,
+                          size: 100.0, color: AppColors.whiteColor),
                       Text(
                         'No streaks found',
                         style: TextStyle(
@@ -106,8 +107,10 @@ class _StreakScreenState extends State<StreakScreen> {
                 );
               } else {
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-                  controller: PageController(viewportFraction: 0.8, keepPage: true),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 10.0),
+                  controller:
+                      PageController(viewportFraction: 0.8, keepPage: true),
                   itemCount: state.streaks.length,
                   itemBuilder: (context, index) {
                     Streak streak = state.streaks[index];
@@ -118,7 +121,8 @@ class _StreakScreenState extends State<StreakScreen> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => StreakDetailScreen(streak: streak),
+                            builder: (context) =>
+                                StreakDetailScreen(streak: streak),
                           ),
                         );
                       },

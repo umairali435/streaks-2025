@@ -79,7 +79,8 @@ class StreakContainer extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       int weekDay = AppConstants.getWeekDay(DateTime.now());
-                      bool isDayActive = streak.selectedDays.contains(weekDay);
+                      bool isDayActive =
+                          streak.selectedDays.contains(weekDay + 1);
                       if (isDayActive && isTodayChecked) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -94,7 +95,9 @@ class StreakContainer extends StatelessWidget {
                           ),
                         );
                       } else if (isDayActive && !isTodayChecked) {
-                        context.read<StreaksBloc>().add(AddStreakDate(streak.id, todayWithoutTime));
+                        context
+                            .read<StreaksBloc>()
+                            .add(AddStreakDate(streak.id, todayWithoutTime));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -113,7 +116,10 @@ class StreakContainer extends StatelessWidget {
                     child: BlocBuilder<StreaksBloc, StreaksState>(
                       builder: (context, state) {
                         if (state is StreaksUpdated) {
-                          isTodayChecked = state.streaks.firstWhere((s) => s.id == streak.id).streakDates.contains(todayWithoutTime);
+                          isTodayChecked = state.streaks
+                              .firstWhere((s) => s.id == streak.id)
+                              .streakDates
+                              .contains(todayWithoutTime);
                         }
                         return Container(
                           height: 35.0,
@@ -123,12 +129,16 @@ class StreakContainer extends StatelessWidget {
                             border: Border.all(
                               color: Color(streak.colorCode),
                             ),
-                            color: isTodayChecked ? Color(streak.colorCode) : AppColors.blackColor,
+                            color: isTodayChecked
+                                ? Color(streak.colorCode)
+                                : AppColors.blackColor,
                           ),
                           child: Icon(
                             LucideIcons.check,
                             size: 22.0,
-                            color: isTodayChecked ? AppColors.whiteColor : AppColors.blackColor,
+                            color: isTodayChecked
+                                ? AppColors.whiteColor
+                                : AppColors.blackColor,
                           ),
                         );
                       },
@@ -145,13 +155,20 @@ class StreakContainer extends StatelessWidget {
                     DateTime today = DateTime.now();
                     int selectedWeekIndex = streak.selectedWeek;
                     int currentWeekIndex = today.weekday;
-                    int dayDifference = ((currentWeekIndex - selectedWeekIndex) % 7);
-                    List<String> reorderedWeeks = AppText.weekDays.sublist(selectedWeekIndex)..addAll(AppText.weekDays.sublist(0, selectedWeekIndex));
-                    List<int> reorderWeekdaysIndex = List.generate(7, (index) => (selectedWeekIndex + index) % 7);
-                    DateTime date = today.subtract(Duration(days: dayDifference - index));
+                    int dayDifference =
+                        ((currentWeekIndex - selectedWeekIndex) % 7);
+                    List<String> reorderedWeeks = AppText.weekDays
+                        .sublist(selectedWeekIndex)
+                      ..addAll(AppText.weekDays.sublist(0, selectedWeekIndex));
+                    List<int> reorderWeekdaysIndex = List.generate(
+                        7, (index) => (selectedWeekIndex + index) % 7);
+                    DateTime date =
+                        today.subtract(Duration(days: dayDifference - index));
                     DateTime weekDay = date;
-                    bool isDayChecked = streak.streakDates.contains(DateTime(weekDay.year, weekDay.month, weekDay.day));
-                    bool isDayActive = streak.selectedDays.contains(reorderWeekdaysIndex[index]);
+                    bool isDayChecked = streak.streakDates.contains(
+                        DateTime(weekDay.year, weekDay.month, weekDay.day));
+                    bool isDayActive = streak.selectedDays
+                        .contains(reorderWeekdaysIndex[index]);
                     return Column(
                       children: [
                         Container(
@@ -180,7 +197,8 @@ class StreakContainer extends StatelessWidget {
                         ),
                         Text(
                           reorderedWeeks[index],
-                          style: GoogleFonts.poppins(color: AppColors.whiteColor),
+                          style:
+                              GoogleFonts.poppins(color: AppColors.whiteColor),
                         ),
                       ],
                     );

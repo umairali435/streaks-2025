@@ -32,7 +32,8 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   String selectedDaysPerWeek = "7";
   List<int> activeDays = [];
   int selectedColorCode = AppConstants.colors.first.value;
-  int selectedContainerColorCode = AppConstants.primaryContainerColors.first.value;
+  int selectedContainerColorCode =
+      AppConstants.primaryContainerColors.first.value;
   int currentIndex = 0;
   TimeOfDay? selectedTime;
 
@@ -46,8 +47,13 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
     activeDaysController.text = selectedDaysPerWeek;
     if (widget.streak != null) {
       nameController.text = widget.streak?.name ?? "";
-      selectedTime = TimeOfDay(hour: widget.streak?.notificationHour ?? 0, minute: widget.streak?.notificationMinute ?? 0);
-      timeController.text = TimeOfDay(hour: widget.streak?.notificationHour ?? 0, minute: widget.streak?.notificationMinute ?? 0).format(context);
+      selectedTime = TimeOfDay(
+          hour: widget.streak?.notificationHour ?? 0,
+          minute: widget.streak?.notificationMinute ?? 0);
+      timeController.text = TimeOfDay(
+              hour: widget.streak?.notificationHour ?? 0,
+              minute: widget.streak?.notificationMinute ?? 0)
+          .format(context);
       selectedWeekDay = AppText.getDayOfWeek(widget.streak?.selectedWeek ?? 0);
       selectedDaysPerWeek = widget.streak?.daysOfWeek.first ?? "";
       activeDaysController.text = selectedDaysPerWeek;
@@ -125,7 +131,15 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
             ),
             CustomDropDownField(
               title: "Week start from",
-              items: const ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+              items: const [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+              ],
               onChanged: (value) {
                 activeDays.clear();
                 setState(() {
@@ -161,7 +175,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                 onDaysSelected: (days) {
                   int selectedDayLength = int.parse(selectedDaysPerWeek);
                   setState(() {
-                    if (!activeDays.contains(AppConstants.selectedDayIndex(days)) && (activeDays.length == selectedDayLength)) {
+                    if (!activeDays
+                            .contains(AppConstants.selectedDayIndex(days)) &&
+                        (activeDays.length == selectedDayLength)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           backgroundColor: AppColors.primaryColor,
@@ -176,8 +192,10 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                       );
                     } else {
                       setState(() {
-                        if (activeDays.contains(AppConstants.selectedDayIndex(days))) {
-                          activeDays.remove(AppConstants.selectedDayIndex(days));
+                        if (activeDays
+                            .contains(AppConstants.selectedDayIndex(days))) {
+                          activeDays
+                              .remove(AppConstants.selectedDayIndex(days));
                         } else {
                           activeDays.add(AppConstants.selectedDayIndex(days));
                         }
@@ -224,7 +242,8 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                       shape: BoxShape.circle,
                       border: Border.all(color: AppColors.whiteColor),
                     ),
-                    child: Icon(state.selectedIcon, color: AppColors.whiteColor),
+                    child:
+                        Icon(state.selectedIcon, color: AppColors.whiteColor),
                   ),
                 );
               },
@@ -236,7 +255,8 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                 width: double.infinity,
                 height: 45.0,
                 decoration: BoxDecoration(
-                  color: FlexColor.redWineDarkPrimary,
+                  color: const Color.from(
+                      alpha: 1, red: 0.894, green: 0.404, blue: 0.486),
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Center(
@@ -300,7 +320,8 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
 
     if (selectedTime != null) {
       timeController.text = selectedTime?.format(context) ?? "";
-      await NotificationService.scheduleDailyNotification(selectedTime, streakName: nameController.text);
+      await NotificationService.scheduleDailyNotification(selectedTime,
+          streakName: nameController.text);
     }
 
     Streak newStreak = Streak(
@@ -359,7 +380,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                           padding: const EdgeInsets.only(left: 14.0),
                           child: InkWell(
                             onTap: () {
-                              context.read<IconBloc>().add(UpdateTabIndex(index));
+                              context
+                                  .read<IconBloc>()
+                                  .add(UpdateTabIndex(index));
                             },
                             child: Column(
                               children: [
@@ -367,7 +390,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                                   categories[index],
                                   style: GoogleFonts.poppins(
                                     fontWeight: FontWeight.w700,
-                                    color: state.currentIndex == index ? AppColors.whiteColor : FlexColor.greyDarkSecondary,
+                                    color: state.currentIndex == index
+                                        ? AppColors.whiteColor
+                                        : FlexColor.greyDarkSecondary,
                                     fontSize: 18.0,
                                   ),
                                 ),
