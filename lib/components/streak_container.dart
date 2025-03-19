@@ -26,7 +26,7 @@ class StreakContainer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Card(
-        color: Color(streak.containerColor).withOpacity(0.2),
+        color: AppColors.cardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -46,7 +46,7 @@ class StreakContainer extends StatelessWidget {
                     height: 45.0,
                     width: 45.0,
                     decoration: BoxDecoration(
-                      color: Color(streak.colorCode),
+                      // color: AppColors.blackColor,
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: Icon(
@@ -146,7 +146,10 @@ class StreakContainer extends StatelessWidget {
                   ),
                 ],
               ),
-              const Gap(20.0),
+              Divider(
+                color: Color(0xFFEFEFEF).withAlpha(100),
+              ),
+              const Gap(2.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(
@@ -177,22 +180,29 @@ class StreakContainer extends StatelessWidget {
                           width: 35.0,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(25.0),
+                            border: Border.all(
+                              color: !isDayChecked && isDayActive
+                                  ? Colors.grey.shade700
+                                  : Colors.transparent,
+                            ),
                             color: isDayChecked
                                 ? Color(streak.colorCode)
                                 : isDayActive
-                                    ? AppColors.whiteColor
+                                    ? Colors.transparent
                                     : AppColors.blackColor,
                           ),
                           child: Center(
-                            child: Icon(
-                              LucideIcons.check,
-                              color: isDayChecked
-                                  ? AppColors.whiteColor
-                                  : isDayActive
-                                      ? Color(streak.colorCode)
-                                      : AppColors.whiteColor,
-                              size: 16.0,
-                            ),
+                            child: isDayChecked
+                                ? Icon(
+                                    LucideIcons.check,
+                                    color: isDayChecked
+                                        ? AppColors.whiteColor
+                                        : isDayActive
+                                            ? Color(streak.colorCode)
+                                            : AppColors.whiteColor,
+                                    size: 16.0,
+                                  )
+                                : Container(),
                           ),
                         ),
                         Text(

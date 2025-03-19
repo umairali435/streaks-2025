@@ -21,7 +21,8 @@ class _StreaksColorsState extends State<StreaksColors> {
   @override
   void initState() {
     super.initState();
-    selectedColorCode = widget.initialColor ?? AppConstants.colors.first.value;
+    selectedColorCode =
+        widget.initialColor ?? AppConstants.colors.first.toARGB32();
   }
 
   @override
@@ -30,14 +31,16 @@ class _StreaksColorsState extends State<StreaksColors> {
       shrinkWrap: true,
       itemCount: AppConstants.colors.length,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
+      gridDelegate:
+          const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 6),
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
             setState(() {
-              selectedColorCode = AppConstants.colors[index].value;
+              selectedColorCode = AppConstants.colors[index].toARGB32();
             });
-            widget.onColorSelected(AppConstants.colors[index].value, AppConstants.primaryContainerColors[index].value);
+            widget.onColorSelected(AppConstants.colors[index].toARGB32(),
+                AppConstants.primaryContainerColors[index].toARGB32());
           },
           child: Stack(
             alignment: Alignment.center,
@@ -45,7 +48,7 @@ class _StreaksColorsState extends State<StreaksColors> {
               ColorCircle(
                 color: AppConstants.colors[index],
               ),
-              if (selectedColorCode == AppConstants.colors[index].value)
+              if (selectedColorCode == AppConstants.colors[index].toARGB32())
                 Container(
                   height: 10.0,
                   width: 10.0,
@@ -70,8 +73,8 @@ class ColorCircle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(3.0),
-      height: 40.0,
-      width: 40.0,
+      height: 50.0,
+      width: 50.0,
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,

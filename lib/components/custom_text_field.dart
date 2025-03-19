@@ -29,39 +29,33 @@ class CustomTextField extends StatelessWidget {
         Text(
           title,
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w700,
             color: AppColors.whiteColor,
+            fontWeight: FontWeight.bold,
             letterSpacing: 0.8,
             fontSize: 18.0,
           ),
         ),
-        const Gap(8.0),
+        const Gap(14.0),
         TextFormField(
           controller: controller,
           readOnly: isReadOnly,
           onTap: onPressed,
           style: const TextStyle(color: AppColors.whiteColor),
-          decoration: const InputDecoration(
+          cursorColor: AppColors.whiteColor,
+          decoration: InputDecoration(
             filled: true,
             isDense: true,
-            fillColor: AppColors.blackColor,
-            border: OutlineInputBorder(
-              borderSide: BorderSide(color: FlexColor.greyDarkSecondary),
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 14.0),
+            fillColor: AppColors.cardColor,
+            border: InputBorder.none,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: BorderSide(color: Colors.transparent),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: FlexColor.greyDarkSecondary),
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: FlexColor.greyDarkSecondaryContainer),
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
+              borderRadius: BorderRadius.circular(5.0),
+              borderSide: BorderSide(color: Colors.transparent),
             ),
           ),
         ),

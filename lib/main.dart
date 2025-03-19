@@ -15,7 +15,7 @@ void main() async {
   await StreaksDatabase.init();
   await NotificationService.initializeNotifications();
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
+    SystemUiOverlayStyle(
       statusBarColor: AppColors.blackColor,
       statusBarIconBrightness: Brightness.dark,
     ),
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: false,
           scaffoldBackgroundColor: AppColors.blackColor,
-          appBarTheme: const AppBarTheme(
+          appBarTheme: AppBarTheme(
             backgroundColor: AppColors.blackColor,
           ),
           textTheme: GoogleFonts.poppinsTextTheme(),
@@ -54,8 +54,10 @@ class MyApp extends StatelessWidget {
             todayBorder: BorderSide(
               color: AppColors.primaryColor,
             ),
-            todayForegroundColor: WidgetStatePropertyAll(AppColors.primaryColor),
-            todayBackgroundColor: const WidgetStatePropertyAll(AppColors.whiteColor),
+            todayForegroundColor:
+                WidgetStatePropertyAll(AppColors.primaryColor),
+            todayBackgroundColor:
+                const WidgetStatePropertyAll(AppColors.whiteColor),
           ),
           timePickerTheme: TimePickerThemeData(
             helpTextStyle: const TextStyle(

@@ -8,7 +8,7 @@ import 'package:streaks/database/streaks_database.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/res/strings.dart';
 import 'package:streaks/screen/add_screen.dart';
-import 'package:streaks/screen/streak_detail_screen.dart';
+import 'package:streaks/screen/streak_details/streak_detail_screen.dart';
 import 'package:streaks/services/url_launcher_service.dart';
 
 class StreakScreen extends StatefulWidget {
@@ -80,6 +80,7 @@ class _StreakScreenState extends State<StreakScreen> {
         ],
       ),
       body: SafeArea(
+        bottom: false,
         child: BlocBuilder<StreaksBloc, StreaksState>(
           builder: (context, state) {
             if (state is StreaksLoading) {
@@ -107,8 +108,7 @@ class _StreakScreenState extends State<StreakScreen> {
                 );
               } else {
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 10.0),
+                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 20.0),
                   controller:
                       PageController(viewportFraction: 0.8, keepPage: true),
                   itemCount: state.streaks.length,

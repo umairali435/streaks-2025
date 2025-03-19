@@ -33,7 +33,10 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
   @override
   void initState() {
     selectedValue = widget.value ?? "";
-    controller.text = (widget.value == null || widget.value == "" || widget.value == "null") ? "" : (widget.value ?? "");
+    controller.text =
+        (widget.value == null || widget.value == "" || widget.value == "null")
+            ? ""
+            : (widget.value ?? "");
     super.initState();
   }
 
@@ -76,7 +79,9 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
               selectedValue: widget.controller?.text ?? selectedValue,
             ),
           ),
-          crossFadeState: isShowDropDown ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          crossFadeState: isShowDropDown
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
           duration: const Duration(milliseconds: 200),
         ),
       ],
@@ -118,13 +123,17 @@ class _CustomListTileState extends State<_CustomListTile> {
                       children: [
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 8.0, top: 5.0, bottom: 5.0),
+                            padding: const EdgeInsets.only(
+                                left: 8.0, top: 5.0, bottom: 5.0),
                             child: Text(
                               widget.data[index],
                               style: GoogleFonts.poppins(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.w900,
-                                color: widget.selectedValue == widget.data[index] ? AppColors.primaryColor : AppColors.whiteColor,
+                                color:
+                                    widget.selectedValue == widget.data[index]
+                                        ? AppColors.primaryColor
+                                        : AppColors.whiteColor,
                               ),
                             ),
                           ),

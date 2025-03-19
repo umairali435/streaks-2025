@@ -204,34 +204,35 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                   });
                 },
               ),
-            Text(
-              "Select Streak Color",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w900,
-                color: AppColors.whiteColor,
-                fontSize: 18.0,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Icon",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.whiteColor,
+                    fontSize: 20.0,
+                  ),
+                ),
+                const Gap(10.0),
+                TextButton.icon(
+                  onPressed: () => _showIconPicker(context),
+                  icon: Text(
+                    "View all",
+                    style: GoogleFonts.poppins(
+                      color: AppColors.primaryColor,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                  label: Icon(
+                    LucideIcons.chevronRight,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+              ],
             ),
-            const Gap(8.0),
-            StreaksColors(
-              initialColor: selectedColorCode,
-              onColorSelected: (colorCode, containerColorCode) {
-                setState(() {
-                  selectedColorCode = colorCode;
-                  selectedContainerColorCode = containerColorCode;
-                });
-              },
-            ),
-            const Gap(8.0),
-            Text(
-              "Select Streak Icon",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w900,
-                color: AppColors.whiteColor,
-                fontSize: 18.0,
-              ),
-            ),
-            const Gap(8.0),
+            const Gap(10.0),
             BlocBuilder<IconBloc, IconState>(
               builder: (context, state) {
                 return GestureDetector(
@@ -239,13 +240,32 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.whiteColor),
+                      color: AppColors.cardColor,
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
                     child:
                         Icon(state.selectedIcon, color: AppColors.whiteColor),
                   ),
                 );
+              },
+            ),
+            const Gap(10.0),
+            Text(
+              "Color",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                color: AppColors.whiteColor,
+                fontSize: 20.0,
+              ),
+            ),
+            const Gap(10.0),
+            StreaksColors(
+              initialColor: selectedColorCode,
+              onColorSelected: (colorCode, containerColorCode) {
+                setState(() {
+                  selectedColorCode = colorCode;
+                  selectedContainerColorCode = containerColorCode;
+                });
               },
             ),
             const Gap(30.0),
@@ -351,86 +371,96 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   void _showIconPicker(BuildContext ctx) {
     final List<String> categories = [
       "All",
+      "Habit",
       "Social",
       "Productivity",
       "Sports",
     ];
     showModalBottomSheet(
       backgroundColor: AppColors.secondaryColor,
+      showDragHandle: true,
       context: context,
-      isScrollControlled: true,
       builder: (context) {
-        return DefaultTabController(
-          length: 4,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Gap(10.0),
-              BlocBuilder<IconBloc, IconState>(
-                bloc: context.read<IconBloc>(),
-                builder: (context, state) {
-                  return SizedBox(
-                    height: 40.0,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: categories.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 14.0),
-                          child: InkWell(
-                            onTap: () {
-                              context
-                                  .read<IconBloc>()
-                                  .add(UpdateTabIndex(index));
-                            },
-                            child: Column(
-                              children: [
-                                Text(
-                                  categories[index],
-                                  style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w700,
-                                    color: state.currentIndex == index
-                                        ? AppColors.whiteColor
-                                        : FlexColor.greyDarkSecondary,
-                                    fontSize: 18.0,
-                                  ),
-                                ),
-                                const Gap(5.0),
-                                if (state.currentIndex == index)
-                                  Container(
-                                    height: 5.0,
-                                    width: 24.0,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryColor,
-                                      borderRadius: BorderRadius.circular(10.0),
+        return BottomSheet(
+          backgroundColor: AppColors.secondaryColor,
+          onClosing: () {},
+          builder: (context) {
+            return DefaultTabController(
+              length: 4,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Gap(10.0),
+                  BlocBuilder<IconBloc, IconState>(
+                    bloc: context.read<IconBloc>(),
+                    builder: (context, state) {
+                      return SizedBox(
+                        height: 40.0,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 14.0),
+                              child: InkWell(
+                                onTap: () {
+                                  context
+                                      .read<IconBloc>()
+                                      .add(UpdateTabIndex(index));
+                                },
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      categories[index],
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w700,
+                                        color: state.currentIndex == index
+                                            ? AppColors.whiteColor
+                                            : FlexColor.greyDarkSecondary,
+                                        fontSize: 18.0,
+                                      ),
                                     ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
+                                    const Gap(5.0),
+                                    if (state.currentIndex == index)
+                                      Container(
+                                        height: 5.0,
+                                        width: 24.0,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryColor,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  BlocBuilder<IconBloc, IconState>(
+                    builder: (context, state) {
+                      return _buildIconGrid(
+                        ctx,
+                        state.currentIndex == 0
+                            ? _allIcons
+                            : state.currentIndex == 1
+                                ? _habitIcons
+                                : state.currentIndex == 2
+                                    ? _socialIcons
+                                    : state.currentIndex == 3
+                                        ? _productivityIcons
+                                        : _sportsIcons,
+                      );
+                    },
+                  ),
+                ],
               ),
-              BlocBuilder<IconBloc, IconState>(
-                builder: (context, state) {
-                  return _buildIconGrid(
-                    ctx,
-                    state.currentIndex == 0
-                        ? _allIcons
-                        : state.currentIndex == 1
-                            ? _socialIcons
-                            : state.currentIndex == 2
-                                ? _productivityIcons
-                                : _sportsIcons,
-                  );
-                },
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -456,8 +486,8 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
             },
             child: Container(
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.whiteColor),
+                color: AppColors.cardColor,
+                borderRadius: BorderRadius.circular(10.0),
               ),
               child: Icon(icon, color: AppColors.whiteColor),
             ),
@@ -539,6 +569,34 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
     LucideIcons.wifi,
     LucideIcons.zap,
     // Add more icons as needed
+  ];
+
+  final List<IconData> _habitIcons = [
+    LucideIcons.dumbbell,
+    LucideIcons.book,
+    LucideIcons.footprints,
+    LucideIcons.bed,
+    LucideIcons.alarmClock,
+    LucideIcons.sun,
+    LucideIcons.glassWater,
+    LucideIcons.utensils,
+    LucideIcons.monitorSmartphone,
+    LucideIcons.beer,
+    LucideIcons.cigarette,
+    LucideIcons.heart,
+    LucideIcons.ban,
+    LucideIcons.layoutGrid,
+    LucideIcons.bike,
+    LucideIcons.brush,
+    LucideIcons.calendar,
+    LucideIcons.car,
+    LucideIcons.checkCircle,
+    LucideIcons.clock,
+    LucideIcons.code,
+    LucideIcons.coffee,
+    LucideIcons.edit,
+    LucideIcons.eye,
+    LucideIcons.flame,
   ];
 
   final List<IconData> _socialIcons = [
@@ -680,13 +738,12 @@ class _SelectStreakActiveDaysState extends State<SelectStreakActiveDays> {
         Text(
           "Select Active Days",
           style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w700,
             color: AppColors.whiteColor,
             letterSpacing: 0.8,
             fontSize: 18.0,
           ),
         ),
-        const Gap(8.0),
+        const Gap(10.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: AppConstants.reorderDaysByIndex(widget.selectedWeekDayIndex)

@@ -6,19 +6,19 @@ class AppConstants {
   static const double borderRadius = 8.0;
 
   static List<Color> colors = [
-    const Color(0xFF1E3A8A),
-    const Color(0xFF3B82F6),
-    const Color(0xFF6B21A8),
-    const Color(0xFF064E3B),
-    const Color(0xFF10B981),
-    const Color(0xFF0EA5E9),
+    const Color(0xFF8174A0),
+    const Color(0xFFAB4459),
+    const Color(0xFF9B7EBD),
+    const Color(0xFF387478),
+    const Color(0xFFEFB6C8),
+    const Color(0xFF578FCA),
     const Color(0xFFB91C1C),
     const Color(0xFF9C4C03),
     const Color(0xFFF59E0B),
-    const Color(0xFF3B3F2B),
-    const Color(0xFF7E3B26),
-    const Color(0xFF333333),
-    const Color(0xFF134E4A),
+    const Color(0xFFDE3163),
+    const Color(0xFFB771E5),
+    const Color(0xFF727D73),
+    const Color(0xFF66D2CE),
     const Color(0xFF4B5563),
     const Color(0xFFEC4899),
     const Color(0xFFF97316),
@@ -26,14 +26,10 @@ class AppConstants {
     const Color(0xFF4C1D95),
     const Color(0xFF9B2C2C),
     const Color(0xFFD1D5DB),
-    const Color(0xFF1D4ED8),
-    const Color(0xFF2F3A46),
+    const Color(0xFFFE4F2D),
+    const Color(0xFFCA8787),
     const Color(0xFF9C4F22),
     const Color(0xFF6EE7B7),
-    const Color(0xFFFCA5A5),
-    const Color(0xFF10B981),
-    const Color(0xFF8B5CF6),
-    const Color(0xFF0F766E),
   ];
 
   static List<Color> primaryContainerColors = [
@@ -61,10 +57,6 @@ class AppConstants {
     const Color(0xFF6B7280),
     const Color(0xFFF4C7A4),
     const Color(0xFFA7F3D0),
-    const Color(0xFFFFBB98),
-    const Color(0xFFA7F3D0),
-    const Color(0xFFA5B4FC),
-    const Color(0xFF5F9A97),
   ];
 
   static int getWeekDay(DateTime date) {
@@ -88,13 +80,22 @@ class AppConstants {
     }
   }
 
-  static List<String> activeDaysSelection = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  static List<String> activeDaysSelection = [
+    "Sun",
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat"
+  ];
 
   static List<String> reorderDaysByIndex(int selectedIndex) {
     if (selectedIndex < 0 || selectedIndex >= activeDaysSelection.length) {
       return activeDaysSelection;
     }
-    return activeDaysSelection.sublist(selectedIndex) + activeDaysSelection.sublist(0, selectedIndex);
+    return activeDaysSelection.sublist(selectedIndex) +
+        activeDaysSelection.sublist(0, selectedIndex);
   }
 
   static int selectedDayIndex(String day) {
