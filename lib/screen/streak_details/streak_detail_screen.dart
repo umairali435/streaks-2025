@@ -305,7 +305,7 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
                   Card(
                     color: AppColors.cardColor,
                     child: Padding(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(10),
                       child: HeatMapCalendar(
                         flexible: true,
                         margin: const EdgeInsets.all(5.0),
@@ -313,7 +313,7 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
                         showColorTip: false,
                         textColor: AppColors.whiteColor,
                         defaultColor: AppColors.greyColor,
-                        weekFontSize: 16.0,
+                        weekFontSize: 12.0,
                         weekTextColor: AppColors.whiteColor,
                         datasets: widget.streak.streakDates.asMap().map(
                           (key, DateTime value) {

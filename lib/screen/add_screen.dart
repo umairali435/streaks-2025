@@ -57,7 +57,7 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
       selectedWeekDay = AppText.getDayOfWeek(widget.streak?.selectedWeek ?? 0);
       selectedDaysPerWeek = widget.streak?.daysOfWeek.first ?? "";
       activeDaysController.text = selectedDaysPerWeek;
-      activeDays = widget.streak?.selectedDays ?? [];
+      activeDays.addAll(widget.streak?.selectedDays ?? []);
       selectedWeekIndex = widget.streak?.selectedWeek ?? 0;
       selectedColorCode = widget.streak!.colorCode;
       selectedContainerColorCode = widget.streak!.containerColor;
@@ -744,44 +744,88 @@ class _SelectStreakActiveDaysState extends State<SelectStreakActiveDays> {
           ),
         ),
         const Gap(10.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: AppConstants.reorderDaysByIndex(widget.selectedWeekDayIndex)
-              .map(
-                (days) => InkWell(
-                  onTap: () => widget.onDaysSelected(days),
-                  child: Container(
-                    width: 50.0,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      color: (widget.activeDays?.contains(
-                                AppConstants.selectedDayIndex(days),
-                              ) ??
-                              false)
-                          ? AppColors.primaryColor
-                          : AppColors.blackColor,
-                      borderRadius: BorderRadius.circular(5.0),
-                      border: !(widget.activeDays?.contains(
-                                AppConstants.selectedDayIndex(days),
-                              ) ??
-                              false)
-                          ? Border.all(
-                              color: FlexColor.greyDarkSecondary,
-                            )
-                          : null,
-                    ),
-                    child: Center(
-                      child: Text(
-                        days,
-                        style: const TextStyle(
-                          color: AppColors.whiteColor,
-                        ),
+        SizedBox(
+          height: 50.0,
+          child: ListView.separated(
+            separatorBuilder: (context, index) => const Gap(10.0),
+            scrollDirection: Axis.horizontal,
+            itemCount:
+                AppConstants.reorderDaysByIndex(widget.selectedWeekDayIndex)
+                    .length,
+            itemBuilder: (context, index) {
+              final days = AppConstants.reorderDaysByIndex(
+                  widget.selectedWeekDayIndex)[index];
+              return InkWell(
+                onTap: () => widget.onDaysSelected(days),
+                child: Container(
+                  width: 50.0,
+                  height: 50.0,
+                  decoration: BoxDecoration(
+                    color: (widget.activeDays?.contains(
+                              AppConstants.selectedDayIndex(days),
+                            ) ??
+                            false)
+                        ? AppColors.primaryColor
+                        : AppColors.blackColor,
+                    borderRadius: BorderRadius.circular(5.0),
+                    border: !(widget.activeDays?.contains(
+                              AppConstants.selectedDayIndex(days),
+                            ) ??
+                            false)
+                        ? Border.all(
+                            color: FlexColor.greyDarkSecondary,
+                          )
+                        : null,
+                  ),
+                  child: Center(
+                    child: Text(
+                      days,
+                      style: const TextStyle(
+                        color: AppColors.whiteColor,
                       ),
                     ),
                   ),
                 ),
-              )
-              .toList(),
+              );
+            },
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // children: AppConstants.reorderDaysByIndex(widget.selectedWeekDayIndex)
+            //     .map(
+            //       (days) => InkWell(
+            //         onTap: () => widget.onDaysSelected(days),
+            //         child: Container(
+            //           width: 50.0,
+            //           height: 50.0,
+            //           decoration: BoxDecoration(
+            //             color: (widget.activeDays?.contains(
+            //                       AppConstants.selectedDayIndex(days),
+            //                     ) ??
+            //                     false)
+            //                 ? AppColors.primaryColor
+            //                 : AppColors.blackColor,
+            //             borderRadius: BorderRadius.circular(5.0),
+            //             border: !(widget.activeDays?.contains(
+            //                       AppConstants.selectedDayIndex(days),
+            //                     ) ??
+            //                     false)
+            //                 ? Border.all(
+            //                     color: FlexColor.greyDarkSecondary,
+            //                   )
+            //                 : null,
+            //           ),
+            //           child: Center(
+            //             child: Text(
+            //               days,
+            //               style: const TextStyle(
+            //                 color: AppColors.whiteColor,
+            //               ),
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //     )
+            //     .toList(),
+          ),
         ),
         const Gap(10.0),
       ],
