@@ -31,9 +31,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   int selectedWeekIndex = 0;
   String selectedDaysPerWeek = "7";
   List<int> activeDays = [];
-  int selectedColorCode = AppConstants.colors.first.value;
+  int selectedColorCode = AppConstants.colors.first.value32bit;
   int selectedContainerColorCode =
-      AppConstants.primaryContainerColors.first.value;
+      AppConstants.primaryContainerColors.first.value32bit;
   int currentIndex = 0;
   TimeOfDay? selectedTime;
 
@@ -61,6 +61,15 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
       selectedWeekIndex = widget.streak?.selectedWeek ?? 0;
       selectedColorCode = widget.streak!.colorCode;
       selectedContainerColorCode = widget.streak!.containerColor;
+      context.read<IconBloc>().add(
+            UpdateSelectedIcon(
+              IconData(
+                widget.streak!.iconCode,
+                fontFamily: "Lucide",
+                fontPackage: 'lucide_icons',
+              ),
+            ),
+          );
       setState(() {});
     }
     super.didChangeDependencies();
@@ -114,6 +123,116 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
               controller: nameController,
               title: "Streak name",
             ),
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.cardColor,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                        child: BlocBuilder<IconBloc, IconState>(
+                          builder: (context, state) {
+                            return GestureDetector(
+                              onTap: () => _showIconPicker(context),
+                              child: Container(
+                                padding: const EdgeInsets.all(12.0),
+                                decoration: BoxDecoration(
+                                  color: AppColors.cardColor,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Icon(state.selectedIcon,
+                                    color: AppColors.whiteColor),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            InkWell(
+                              onTap: () => _showIconPicker(context),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 12.0,
+                                  right: 12.0,
+                                  bottom: 12.0,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Icon",
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.whiteColor,
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
+                                    Icon(
+                                      LucideIcons.chevronRight,
+                                      color: AppColors.greyColor,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () => _showColorPicker(context),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 12.0,
+                                  right: 12.0,
+                                  bottom: 12.0,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Color",
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.whiteColor,
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
+                                    const Gap(10.0),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          height: 30.0,
+                                          width: 30.0,
+                                          decoration: BoxDecoration(
+                                            color: Color(selectedColorCode),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const Gap(10.0),
+                                        Icon(
+                                          LucideIcons.chevronRight,
+                                          color: AppColors.greyColor,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const Gap(20.0),
             CustomTextField(
               controller: timeController,
               isReadOnly: true,
@@ -204,70 +323,6 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                   });
                 },
               ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Icon",
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.whiteColor,
-                    fontSize: 20.0,
-                  ),
-                ),
-                const Gap(10.0),
-                TextButton.icon(
-                  onPressed: () => _showIconPicker(context),
-                  icon: Text(
-                    "View all",
-                    style: GoogleFonts.poppins(
-                      color: AppColors.primaryColor,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                  label: Icon(
-                    LucideIcons.chevronRight,
-                    color: AppColors.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            const Gap(10.0),
-            BlocBuilder<IconBloc, IconState>(
-              builder: (context, state) {
-                return GestureDetector(
-                  onTap: () => _showIconPicker(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(12.0),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardColor,
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child:
-                        Icon(state.selectedIcon, color: AppColors.whiteColor),
-                  ),
-                );
-              },
-            ),
-            const Gap(10.0),
-            Text(
-              "Color",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                color: AppColors.whiteColor,
-                fontSize: 20.0,
-              ),
-            ),
-            const Gap(10.0),
-            StreaksColors(
-              initialColor: selectedColorCode,
-              onColorSelected: (colorCode, containerColorCode) {
-                setState(() {
-                  selectedColorCode = colorCode;
-                  selectedContainerColorCode = containerColorCode;
-                });
-              },
-            ),
             const Gap(30.0),
             GestureDetector(
               onTap: _saveStreak,
@@ -275,8 +330,7 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                 width: double.infinity,
                 height: 45.0,
                 decoration: BoxDecoration(
-                  color: const Color.from(
-                      alpha: 1, red: 0.894, green: 0.404, blue: 0.486),
+                  color: AppColors.primaryColor,
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Center(
@@ -366,6 +420,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
       context.read<StreaksBloc>().add(UpdateStreak(newStreak));
     }
     navigator.pop();
+    if (widget.streak != null) {
+      navigator.pop();
+    }
   }
 
   void _showIconPicker(BuildContext ctx) {
@@ -459,6 +516,32 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                   ),
                 ],
               ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showColorPicker(context) {
+    showModalBottomSheet(
+      backgroundColor: AppColors.secondaryColor,
+      showDragHandle: true,
+      context: context,
+      builder: (context) {
+        return BottomSheet(
+          backgroundColor: AppColors.secondaryColor,
+          onClosing: () {},
+          builder: (context) {
+            return StreaksColors(
+              initialColor: selectedColorCode,
+              onColorSelected: (colorCode, containerColorCode) {
+                setState(() {
+                  selectedColorCode = colorCode;
+                  selectedContainerColorCode = containerColorCode;
+                });
+                Navigator.pop(context);
+              },
             );
           },
         );
@@ -738,9 +821,8 @@ class _SelectStreakActiveDaysState extends State<SelectStreakActiveDays> {
         Text(
           "Select Active Days",
           style: GoogleFonts.poppins(
-            color: AppColors.whiteColor,
-            letterSpacing: 0.8,
-            fontSize: 18.0,
+            color: Color(0xFFBFCFE7),
+            fontSize: 16.0,
           ),
         ),
         const Gap(10.0),
@@ -788,43 +870,6 @@ class _SelectStreakActiveDaysState extends State<SelectStreakActiveDays> {
                 ),
               );
             },
-            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            // children: AppConstants.reorderDaysByIndex(widget.selectedWeekDayIndex)
-            //     .map(
-            //       (days) => InkWell(
-            //         onTap: () => widget.onDaysSelected(days),
-            //         child: Container(
-            //           width: 50.0,
-            //           height: 50.0,
-            //           decoration: BoxDecoration(
-            //             color: (widget.activeDays?.contains(
-            //                       AppConstants.selectedDayIndex(days),
-            //                     ) ??
-            //                     false)
-            //                 ? AppColors.primaryColor
-            //                 : AppColors.blackColor,
-            //             borderRadius: BorderRadius.circular(5.0),
-            //             border: !(widget.activeDays?.contains(
-            //                       AppConstants.selectedDayIndex(days),
-            //                     ) ??
-            //                     false)
-            //                 ? Border.all(
-            //                     color: FlexColor.greyDarkSecondary,
-            //                   )
-            //                 : null,
-            //           ),
-            //           child: Center(
-            //             child: Text(
-            //               days,
-            //               style: const TextStyle(
-            //                 color: AppColors.whiteColor,
-            //               ),
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //     )
-            //     .toList(),
           ),
         ),
         const Gap(10.0),

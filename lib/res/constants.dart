@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class AppConstants {
@@ -159,5 +160,24 @@ class AppConstants {
       default:
         return "Unknown";
     }
+  }
+
+  static String getRandomMotivationalMessage(String streakName) {
+    final List<String> motivationalMessages = [
+      "🔥 You're on fire! Keep that $streakName streak alive – tap to check in now!",
+      "⏰ Just a minute a day keeps the streak alive! Tap to complete your $streakName streak!",
+      "🎯 Small steps, big results. Let’s crush your $streakName today!",
+      "🚀 Momentum is magic – don’t lose it! Complete your $streakName now!",
+      "🌟 Consistency creates success. Tap now and keep your $streakName going strong!",
+      "👣 One tap closer to your goals. Don’t break the $streakName streak!",
+      "🏁 You’re doing amazing – finish today’s $streakName and stay on track!",
+      "💪 Show up for yourself! Hit your $streakName goal today. Let’s go!",
+      "🧠 Your future self will thank you – log today’s $streakName progress!",
+      "✨ Greatness is built daily – keep your $streakName alive with just one tap!"
+    ];
+
+    final math.Random random = math.Random();
+    int index = random.nextInt(motivationalMessages.length);
+    return motivationalMessages[index];
   }
 }

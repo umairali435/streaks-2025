@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:streaks/res/constants.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -45,9 +46,9 @@ class NotificationService {
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
+      streakName.hashCode,
       '$streakName Streak',
-      'Don\'t forget to complete your $streakName streak!',
+      AppConstants.getRandomMotivationalMessage(streakName ?? ""),
       tzNotificationTime,
       platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.exact,

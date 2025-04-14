@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:streaks/res/colors.dart';
 
 class CustomTextField extends StatelessWidget {
-  final String title;
+  final String title, hintText;
   final TextEditingController controller;
   final VoidCallback? onPressed;
   final bool isReadOnly;
@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
     required this.title,
+    this.hintText = "",
     required this.controller,
     this.onPressed,
     this.isReadOnly = false,
@@ -28,10 +29,9 @@ class CustomTextField extends StatelessWidget {
         Text(
           title,
           style: GoogleFonts.poppins(
-            color: AppColors.whiteColor,
+            color: AppColors.greyColor,
             fontWeight: FontWeight.bold,
-            letterSpacing: 0.8,
-            fontSize: 18.0,
+            fontSize: 16.0,
           ),
         ),
         const Gap(14.0),
@@ -42,6 +42,11 @@ class CustomTextField extends StatelessWidget {
           style: const TextStyle(color: AppColors.whiteColor),
           cursorColor: AppColors.whiteColor,
           decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: const TextStyle(
+              color: Color(0xFFBFCFE7),
+              fontSize: 14.0,
+            ),
             filled: true,
             isDense: true,
             contentPadding:
@@ -49,11 +54,11 @@ class CustomTextField extends StatelessWidget {
             fillColor: AppColors.cardColor,
             border: InputBorder.none,
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5.0),
+              borderRadius: BorderRadius.circular(10.0),
               borderSide: BorderSide(color: Colors.transparent),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5.0),
+              borderRadius: BorderRadius.circular(10.0),
               borderSide: BorderSide(color: Colors.transparent),
             ),
           ),

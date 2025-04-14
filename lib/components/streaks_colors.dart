@@ -28,9 +28,9 @@ class _StreaksColorsState extends State<StreaksColors> {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+      padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 20.0),
       shrinkWrap: true,
       itemCount: AppConstants.colors.length,
-      physics: const NeverScrollableScrollPhysics(),
       gridDelegate:
           const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 6),
       itemBuilder: (context, index) {

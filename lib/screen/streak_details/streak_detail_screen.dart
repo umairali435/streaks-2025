@@ -111,11 +111,36 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
               color: AppColors.whiteColor,
             ),
             onPressed: () async {
-              await StreaksDatabase.deleteStreakById(widget.streak.id)
-                  .then((_) {
-                context.read<StreaksBloc>().add(LoadStreaks());
-                Navigator.of(context).pop();
-              });
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Delete Streak"),
+                    content: const Text(
+                        "Are you sure you want to delete this streak?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await StreaksDatabase.deleteStreakById(
+                                  widget.streak.id)
+                              .then((_) {
+                            context.read<StreaksBloc>().add(LoadStreaks());
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          });
+                        },
+                        child: const Text("Delete"),
+                      ),
+                    ],
+                  );
+                },
+              );
             },
           ),
         ],
@@ -291,7 +316,7 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
                                 decoration: BoxDecoration(
                                   color: isStreakDay
                                       ? Color(widget.streak.colorCode)
-                                      : AppColors.greyColor,
+                                      : AppColors.greyColor.withAlpha(100),
                                   borderRadius: BorderRadius.circular(2.0),
                                 ),
                               );
@@ -312,7 +337,7 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
                         colorMode: ColorMode.color,
                         showColorTip: false,
                         textColor: AppColors.whiteColor,
-                        defaultColor: AppColors.greyColor,
+                        defaultColor: AppColors.greyColor.withAlpha(100),
                         weekFontSize: 12.0,
                         weekTextColor: AppColors.whiteColor,
                         datasets: widget.streak.streakDates.asMap().map(

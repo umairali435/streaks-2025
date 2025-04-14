@@ -1,4 +1,3 @@
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:streaks/components/custom_text_field.dart';
@@ -62,7 +61,7 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
             margin: const EdgeInsets.only(bottom: 10.0),
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             decoration: BoxDecoration(
-              color: FlexColor.lightFlexInverseSurface,
+              color: AppColors.cardColor,
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: _CustomListTile(
@@ -124,12 +123,12 @@ class _CustomListTileState extends State<_CustomListTile> {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.only(
-                                left: 8.0, top: 5.0, bottom: 5.0),
+                                left: 14.0, top: 5.0, bottom: 5.0),
                             child: Text(
                               widget.data[index],
                               style: GoogleFonts.poppins(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w900,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
                                 color:
                                     widget.selectedValue == widget.data[index]
                                         ? AppColors.primaryColor
@@ -141,8 +140,8 @@ class _CustomListTileState extends State<_CustomListTile> {
                       ],
                     ),
                     if (index + 1 != widget.data.length)
-                      const Divider(
-                        color: AppColors.greyColor,
+                      Divider(
+                        color: AppColors.greyColor.withAlpha(100),
                       )
                   ],
                 ),

@@ -42,24 +42,16 @@ class StreakContainer extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    height: 45.0,
-                    width: 45.0,
-                    decoration: BoxDecoration(
-                      // color: AppColors.blackColor,
-                      borderRadius: BorderRadius.circular(10.0),
+                  Icon(
+                    IconData(
+                      streak.iconCode,
+                      fontFamily: "Lucide",
+                      fontPackage: 'lucide_icons',
                     ),
-                    child: Icon(
-                      IconData(
-                        streak.iconCode,
-                        fontFamily: "Lucide",
-                        fontPackage: 'lucide_icons',
-                      ),
-                      size: 28.0,
-                      color: AppColors.whiteColor,
-                    ),
+                    size: 28.0,
+                    color: AppColors.whiteColor,
                   ),
-                  const Gap(10.0),
+                  const Gap(14.0),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
@@ -67,9 +59,9 @@ class StreakContainer extends StatelessWidget {
                       Text(
                         streak.name,
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
                           color: AppColors.whiteColor,
-                          fontSize: 18.0,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16.0,
                           height: 1.0,
                         ),
                       ),
@@ -147,9 +139,9 @@ class StreakContainer extends StatelessWidget {
                 ],
               ),
               Divider(
-                color: Color(0xFFEFEFEF).withAlpha(100),
+                color: AppColors.greyColor.withAlpha(100),
+                height: 25.0,
               ),
-              const Gap(2.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(
