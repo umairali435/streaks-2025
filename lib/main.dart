@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:streaks/bloc/streaks_bloc.dart';
+import 'package:streaks/purchases_bloc/purchases_bloc.dart';
+import 'package:streaks/purchases_bloc/purchases_event.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/screen/streak_screen.dart';
 import 'package:streaks/database/streaks_database.dart';
@@ -36,6 +38,9 @@ class MyApp extends StatelessWidget {
           create: (context) => StreaksBloc()..add(LoadStreaks()),
         ),
         BlocProvider(
+          create: (context) => PurchasesBloc()..add(InitPurchases()),
+        ),
+        BlocProvider(
           create: (context) => IconBloc(),
         ),
       ],
@@ -54,10 +59,8 @@ class MyApp extends StatelessWidget {
             todayBorder: BorderSide(
               color: AppColors.primaryColor,
             ),
-            todayForegroundColor:
-                WidgetStatePropertyAll(AppColors.primaryColor),
-            todayBackgroundColor:
-                const WidgetStatePropertyAll(AppColors.whiteColor),
+            todayForegroundColor: WidgetStatePropertyAll(AppColors.primaryColor),
+            todayBackgroundColor: const WidgetStatePropertyAll(AppColors.whiteColor),
           ),
           timePickerTheme: TimePickerThemeData(
             helpTextStyle: const TextStyle(

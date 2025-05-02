@@ -8,6 +8,7 @@ import 'package:streaks/database/streaks_database.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/res/strings.dart';
 import 'package:streaks/screen/add_screen.dart';
+import 'package:streaks/screen/purchases_screen.dart';
 import 'package:streaks/screen/streak_details/streak_detail_screen.dart';
 import 'package:streaks/services/url_launcher_service.dart';
 
@@ -27,7 +28,7 @@ class _StreakScreenState extends State<StreakScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          "Streaks Chain",
+          "Streaks 2025",
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w900,
             color: AppColors.whiteColor,
@@ -62,6 +63,19 @@ class _StreakScreenState extends State<StreakScreen> {
         actions: [
           IconButton(
             onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const PurchasesScreen(),
+                ),
+              );
+            },
+            icon: const Icon(
+              LucideIcons.crown,
+              color: AppColors.whiteColor,
+            ),
+          ),
+          IconButton(
+            onPressed: () {
               Navigator.of(context)
                   .push(
                 MaterialPageRoute(
@@ -93,8 +107,7 @@ class _StreakScreenState extends State<StreakScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(LucideIcons.flame,
-                          size: 100.0, color: AppColors.whiteColor),
+                      Icon(LucideIcons.flame, size: 100.0, color: AppColors.whiteColor),
                       Text(
                         'No streaks found',
                         style: TextStyle(
@@ -109,8 +122,7 @@ class _StreakScreenState extends State<StreakScreen> {
               } else {
                 return ListView.builder(
                   padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 20.0),
-                  controller:
-                      PageController(viewportFraction: 0.8, keepPage: true),
+                  controller: PageController(viewportFraction: 0.8, keepPage: true),
                   itemCount: state.streaks.length,
                   itemBuilder: (context, index) {
                     Streak streak = state.streaks[index];
@@ -121,8 +133,7 @@ class _StreakScreenState extends State<StreakScreen> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) =>
-                                StreakDetailScreen(streak: streak),
+                            builder: (context) => StreakDetailScreen(streak: streak),
                           ),
                         );
                       },
