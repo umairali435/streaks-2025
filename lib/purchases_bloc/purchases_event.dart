@@ -32,3 +32,12 @@ class SelectPackage extends PurchasesEvent {
   @override
   List<Object?> get props => [package, index];
 }
+
+class TotalAddedStreaks extends PurchasesEvent {
+  final int length;
+
+  const TotalAddedStreaks(this.length);
+
+  @override
+  List<Object?> get props => [length];
+}

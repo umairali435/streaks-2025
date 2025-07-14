@@ -44,10 +44,10 @@ class CustomButton extends StatelessWidget {
                 )
               : Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     letterSpacing: 1.2,
                     fontSize: 16.0,
-                    color: AppColors.whiteColor,
+                    color: AppColors.blackColor,
                   ),
                 ),
         ),

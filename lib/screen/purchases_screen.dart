@@ -20,6 +20,12 @@ class PurchasesScreen extends StatefulWidget {
 
 class _PurchasesScreenState extends State<PurchasesScreen> {
   @override
+  void initState() {
+    context.read<PurchasesBloc>().add(InitPurchases());
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -67,13 +73,15 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                               children: [
                                 Image.asset(
                                   'assets/subscription_image.png',
-                                  height: MediaQuery.of(context).size.height * 0.30,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.30,
                                 ),
                                 const OfferingWidget(),
                                 const Packages(),
                                 const Gap(10.0),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 50.0),
                                   child: CustomButton(
                                     radius: 25.0,
                                     margin: 5.0,
@@ -82,9 +90,9 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                                         : "Buy Subscription",
                                     onTap: () async {
                                       if (state.selectedPackage != null) {
-                                        context
-                                            .read<PurchasesBloc>()
-                                            .add(PurchaseSubscription(state.selectedPackage!));
+                                        context.read<PurchasesBloc>().add(
+                                            PurchaseSubscription(
+                                                state.selectedPackage!));
                                       } else {
                                         Fluttertoast.showToast(
                                           msg: "Select one package",
@@ -103,7 +111,9 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                                     ),
                                   ),
                                   onPressed: () async {
-                                    context.read<PurchasesBloc>().add(RestoreSubscription());
+                                    context
+                                        .read<PurchasesBloc>()
+                                        .add(RestoreSubscription());
                                   },
                                 ),
                                 BillingInfoWidget(),
@@ -159,7 +169,9 @@ class _PackagesState extends State<Packages> {
                     selectedPackage: state.selectedIndex == 0 ? true : false,
                     showPercentage: false,
                     onTap: () async {
-                      context.read<PurchasesBloc>().add(SelectPackage(offers.monthly!, 0));
+                      context
+                          .read<PurchasesBloc>()
+                          .add(SelectPackage(offers.monthly!, 0));
                     },
                   ),
                   PackagesWidgets(
@@ -173,7 +185,9 @@ class _PackagesState extends State<Packages> {
                     showPercentage: true,
                     percentage: "50",
                     onTap: () async {
-                      context.read<PurchasesBloc>().add(SelectPackage(offers.annual!, 1));
+                      context
+                          .read<PurchasesBloc>()
+                          .add(SelectPackage(offers.annual!, 1));
                     },
                   ),
                 ],
@@ -252,11 +266,14 @@ class PackagesWidgets extends StatelessWidget {
             children: [
               Container(
                 width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
                   border: Border.all(
-                    color: selectedPackage ? AppColors.primaryColor : AppColors.greyColor,
+                    color: selectedPackage
+                        ? AppColors.primaryColor
+                        : AppColors.greyColor,
                   ),
                 ),
                 child: Column(
@@ -266,18 +283,19 @@ class PackagesWidgets extends StatelessWidget {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color:
-                              selectedPackage ? AppColors.primaryColor : AppColors.secondaryColor,
+                          color: selectedPackage
+                              ? AppColors.primaryColor
+                              : AppColors.secondaryColor,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(6.0),
                             topRight: Radius.circular(6.0),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Try for free",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: AppColors.whiteColor,
+                            color: AppColors.blackColor,
                           ),
                         ),
                       ),
@@ -335,7 +353,7 @@ class PackagesWidgets extends StatelessWidget {
                     "Save $percentage%",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: AppColors.whiteColor,
+                      color: AppColors.blackColor,
                     ),
                   ),
                 ),

@@ -7,57 +7,56 @@ class AppConstants {
   static const double borderRadius = 8.0;
 
   static List<Color> colors = [
-    const Color(0xFF8174A0),
-    const Color(0xFFAB4459),
-    const Color(0xFF9B7EBD),
-    const Color(0xFF387478),
-    const Color(0xFFEFB6C8),
-    const Color(0xFF578FCA),
-    const Color(0xFFB91C1C),
-    const Color(0xFF9C4C03),
-    const Color(0xFFF59E0B),
-    const Color(0xFFDE3163),
-    const Color(0xFFB771E5),
-    const Color(0xFF727D73),
-    const Color(0xFF66D2CE),
-    const Color(0xFF4B5563),
-    const Color(0xFFEC4899),
-    const Color(0xFFF97316),
-    const Color(0xFF6B21A8),
-    const Color(0xFF4C1D95),
-    const Color(0xFF9B2C2C),
-    const Color(0xFFD1D5DB),
-    const Color(0xFFFE4F2D),
-    const Color(0xFFCA8787),
-    const Color(0xFF9C4F22),
-    const Color(0xFF6EE7B7),
+    Color(0xFF00E676), // Bright Mint Green
+    Color(0xFF40C4FF), // Vivid Sky Blue
+    Color(0xFFFF4081), // Hot Pink
+    Color(0xFFFFD600), // Bright Yellow
+    Color(0xFF7C4DFF), // Electric Purple
+    Color(0xFF69F0AE), // Light Green
+    Color(0xFFFF5722), // Deep Orange
+    Color(0xFF1DE9B6), // Aqua Mint
+    Color(0xFFFFAB40), // Orange Accent
+    Color(0xFFFF5252), // Bright Red
+    Color(0xFF448AFF), // Bold Blue
+    Color(0xFFFFC400), // Neon Amber
+    Color(0xFF18FFFF), // Bright Cyan
+    Color(0xFF82B1FF), // Light Indigo
+    Color(0xFFFF6E40), // Neon Coral
+    Color(0xFF64FFDA), // Fresh Teal
+    Color(0xFF536DFE), // Indigo Accent
+    Color(0xFFFF8A80), // Soft Red
+    Color(0xFF00BFA5), // Emerald
+    Color(0xFFFFA726), // Bright Orange
+    Color(0xFF00B8D4), // Turquoise Blue
+    Color(0xFFFFC107), // Amber
+    Color(0xFFEA80FC), // Light Purple
+    Color(0xFFB9F6CA), // Mint Pastel
   ];
-
   static List<Color> primaryContainerColors = [
-    const Color(0xFF93C5FD),
-    const Color(0xFF60A5FA),
-    const Color(0xFFD8B4FE),
-    const Color(0xFF6EE7B7),
-    const Color(0xFF6EE7A9),
-    const Color(0xFF38BDF8),
-    const Color(0xFFFCA5A5),
-    const Color(0xFFFBBF24),
-    const Color(0xFFFDE68A),
-    const Color(0xFFA3B18C),
-    const Color(0xFFE2D6C8),
-    const Color(0xFFA0A0A0),
-    const Color(0xFF64D5D2),
-    const Color(0xFF6B7280),
-    const Color(0xFFFBCFE8),
-    const Color(0xFFFDBA74),
-    const Color(0xFFD8B5FE),
-    const Color(0xFFA5B4FC),
-    const Color(0xFFF4A6A1),
-    const Color(0xFFF1F5F9),
-    const Color(0xFF93C5FD),
-    const Color(0xFF6B7280),
-    const Color(0xFFF4C7A4),
-    const Color(0xFFA7F3D0),
+    Color(0xFF1B1B1B), // Jet Black
+    Color(0xFF263238), // Blue Gray
+    Color(0xFF2E3A59), // Midnight Blue
+    Color(0xFF37474F), // Charcoal Gray
+    Color(0xFF1A237E), // Deep Indigo
+    Color(0xFF004D40), // Dark Teal
+    Color(0xFF3E2723), // Rich Brown
+    Color(0xFF311B92), // Dark Purple
+    Color(0xFF212121), // True Black
+    Color(0xFF263238), // Repeat for balance
+    Color(0xFF1C1C1C), // Near Black
+    Color(0xFF374151), // Slate Gray
+    Color(0xFF2C2C2C), // Muted Black
+    Color(0xFF1F2937), // Tailwind's Gray-800
+    Color(0xFF0F172A), // Deep Navy
+    Color(0xFF111827), // Cool Gray
+    Color(0xFF1A1A2E), // Ink Black
+    Color(0xFF2D2D44), // Grayish Navy
+    Color(0xFF242424), // Softened Black
+    Color(0xFF101010), // Almost pure black
+    Color(0xFF20232A), // Dark Mode Neutral
+    Color(0xFF1A202C), // Steel Gray
+    Color(0xFF171717), // True Dark
+    Color(0xFF111111), // UI Black
   ];
 
   static int getWeekDay(DateTime date) {

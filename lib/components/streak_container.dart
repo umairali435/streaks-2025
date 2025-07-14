@@ -128,9 +128,7 @@ class StreakContainer extends StatelessWidget {
                           child: Icon(
                             LucideIcons.check,
                             size: 22.0,
-                            color: isTodayChecked
-                                ? AppColors.whiteColor
-                                : AppColors.blackColor,
+                            color: AppColors.blackColor,
                           ),
                         );
                       },
@@ -188,10 +186,10 @@ class StreakContainer extends StatelessWidget {
                                 ? Icon(
                                     LucideIcons.check,
                                     color: isDayChecked
-                                        ? AppColors.whiteColor
+                                        ? AppColors.blackColor
                                         : isDayActive
                                             ? Color(streak.colorCode)
-                                            : AppColors.whiteColor,
+                                            : AppColors.blackColor,
                                     size: 16.0,
                                   )
                                 : Container(),

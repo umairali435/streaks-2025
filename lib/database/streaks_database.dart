@@ -63,6 +63,10 @@ class StreaksDatabase {
     return await isar.streaks.where().findAll();
   }
 
+  static Future<int> getAllStreaksLength() async {
+    return await isar.streaks.where().count();
+  }
+
   static Future<void> addStreakDate(Id id, DateTime date) async {
     await isar.writeTxn(() async {
       final streak = await isar.streaks.get(id);

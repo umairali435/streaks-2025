@@ -9,9 +9,13 @@ import 'package:streaks/components/custom_drop_down_field.dart';
 import 'package:streaks/components/custom_text_field.dart';
 import 'package:streaks/components/streaks_colors.dart';
 import 'package:streaks/database/streaks_database.dart';
+import 'package:streaks/purchases_bloc/purchases_bloc.dart';
+import 'package:streaks/purchases_bloc/purchases_event.dart';
+import 'package:streaks/purchases_bloc/purchases_state.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/res/constants.dart';
 import 'package:streaks/res/strings.dart';
+import 'package:streaks/screen/purchases_screen.dart';
 import 'package:streaks/services/notification_service.dart';
 
 class AddStrekScreen extends StatefulWidget {
@@ -39,6 +43,7 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
 
   @override
   void initState() {
+    context.read<PurchasesBloc>().add(TotalAddedStreaks(0));
     super.initState();
   }
 
@@ -85,7 +90,6 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
         leading: IconButton(
           icon: const Icon(
             LucideIcons.chevronLeft,
-            color: AppColors.whiteColor,
           ),
           onPressed: () {
             Navigator.of(context).pop();
@@ -95,18 +99,31 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
           widget.streak == null ? "Add New Streak" : "Edit Streak",
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w700,
-            color: AppColors.whiteColor,
             fontSize: 18.0,
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: _saveStreak,
-            icon: const Icon(
-              LucideIcons.checkCircle,
-              color: AppColors.whiteColor,
-            ),
-          ),
+          BlocBuilder<PurchasesBloc, PurchasesState>(
+            builder: (context, state) {
+              return IconButton(
+                onPressed: () {
+                  if (state.totalStreaksLength > 3 &&
+                      !state.isSubscriptionActive) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PurchasesScreen()),
+                    );
+                  } else {
+                    _saveStreak();
+                  }
+                },
+                icon: const Icon(
+                  LucideIcons.checkCircle,
+                ),
+              );
+            },
+          )
         ],
       ),
       body: SingleChildScrollView(
@@ -324,26 +341,40 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                 },
               ),
             const Gap(30.0),
-            GestureDetector(
-              onTap: _saveStreak,
-              child: Container(
-                width: double.infinity,
-                height: 45.0,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor,
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Center(
-                  child: Text(
-                    "Save",
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.whiteColor,
-                      fontSize: 18.0,
+            BlocBuilder<PurchasesBloc, PurchasesState>(
+              builder: (context, state) {
+                return GestureDetector(
+                  onTap: () {
+                    if (state.totalStreaksLength > 3 &&
+                        !state.isSubscriptionActive) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PurchasesScreen()),
+                      );
+                    } else {
+                      _saveStreak();
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 45.0,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Save",
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 18.0,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
             const Gap(20.0),
           ],
@@ -862,8 +893,13 @@ class _SelectStreakActiveDaysState extends State<SelectStreakActiveDays> {
                   child: Center(
                     child: Text(
                       days,
-                      style: const TextStyle(
-                        color: AppColors.whiteColor,
+                      style: TextStyle(
+                        color: !(widget.activeDays?.contains(
+                                  AppConstants.selectedDayIndex(days),
+                                ) ??
+                                false)
+                            ? AppColors.whiteColor
+                            : AppColors.blackColor,
                       ),
                     ),
                   ),

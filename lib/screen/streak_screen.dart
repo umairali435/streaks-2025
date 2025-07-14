@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:streaks/bloc/streaks_bloc.dart';
 import 'package:streaks/components/streak_container.dart';
 import 'package:streaks/database/streaks_database.dart';
+import 'package:streaks/res/assets.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/res/strings.dart';
 import 'package:streaks/screen/add_screen.dart';
@@ -31,14 +32,12 @@ class _StreakScreenState extends State<StreakScreen> {
           "Streaks 2025",
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w900,
-            color: AppColors.whiteColor,
             fontSize: 18.0,
           ),
         ),
         leading: PopupMenuButton<String>(
           icon: const Icon(
             LucideIcons.settings,
-            color: AppColors.whiteColor,
           ),
           onSelected: (value) async {
             if (value == 'privacy_policy') {
@@ -71,7 +70,6 @@ class _StreakScreenState extends State<StreakScreen> {
             },
             icon: const Icon(
               LucideIcons.crown,
-              color: AppColors.whiteColor,
             ),
           ),
           IconButton(
@@ -88,7 +86,6 @@ class _StreakScreenState extends State<StreakScreen> {
             },
             icon: const Icon(
               LucideIcons.plusSquare,
-              color: AppColors.whiteColor,
             ),
           ),
         ],
@@ -103,17 +100,20 @@ class _StreakScreenState extends State<StreakScreen> {
               return Center(child: Text('Error: ${state.message}'));
             } else if (state is StreaksUpdated) {
               if (state.streaks.isEmpty) {
-                return const Center(
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(LucideIcons.flame, size: 100.0, color: AppColors.whiteColor),
+                      Image.asset(
+                        AppAssets.noHabits,
+                        height: 300.0,
+                      ),
                       Text(
                         'No streaks found',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           color: AppColors.whiteColor,
                           fontWeight: FontWeight.bold,
-                          fontSize: 22.0,
+                          fontSize: 32.0,
                         ),
                       ),
                     ],
@@ -121,8 +121,9 @@ class _StreakScreenState extends State<StreakScreen> {
                 );
               } else {
                 return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 20.0),
-                  controller: PageController(viewportFraction: 0.8, keepPage: true),
+                  padding: const EdgeInsets.fromLTRB(8.0, 20.0, 8.0, 20.0),
+                  controller:
+                      PageController(viewportFraction: 0.8, keepPage: true),
                   itemCount: state.streaks.length,
                   itemBuilder: (context, index) {
                     Streak streak = state.streaks[index];
@@ -133,7 +134,8 @@ class _StreakScreenState extends State<StreakScreen> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => StreakDetailScreen(streak: streak),
+                            builder: (context) =>
+                                StreakDetailScreen(streak: streak),
                           ),
                         );
                       },

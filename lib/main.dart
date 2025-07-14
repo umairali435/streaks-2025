@@ -7,13 +7,16 @@ import 'package:streaks/bloc/streaks_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_event.dart';
 import 'package:streaks/res/colors.dart';
+import 'package:streaks/screen/onboarding_screen.dart';
 import 'package:streaks/screen/streak_screen.dart';
 import 'package:streaks/database/streaks_database.dart';
 import 'package:streaks/screen/add_screen.dart';
 import 'package:streaks/services/notification_service.dart';
+import 'package:streaks/services/share_prefs_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SharePrefsService.init();
   await StreaksDatabase.init();
   await NotificationService.initializeNotifications();
   SystemChrome.setSystemUIOverlayStyle(
@@ -50,7 +53,8 @@ class MyApp extends StatelessWidget {
           useMaterial3: false,
           scaffoldBackgroundColor: AppColors.blackColor,
           appBarTheme: AppBarTheme(
-            backgroundColor: AppColors.blackColor,
+            backgroundColor: AppColors.primaryColor,
+            foregroundColor: AppColors.blackColor,
           ),
           textTheme: GoogleFonts.poppinsTextTheme(),
           datePickerTheme: DatePickerThemeData(
@@ -59,8 +63,10 @@ class MyApp extends StatelessWidget {
             todayBorder: BorderSide(
               color: AppColors.primaryColor,
             ),
-            todayForegroundColor: WidgetStatePropertyAll(AppColors.primaryColor),
-            todayBackgroundColor: const WidgetStatePropertyAll(AppColors.whiteColor),
+            todayForegroundColor:
+                WidgetStatePropertyAll(AppColors.primaryColor),
+            todayBackgroundColor:
+                const WidgetStatePropertyAll(AppColors.whiteColor),
           ),
           timePickerTheme: TimePickerThemeData(
             helpTextStyle: const TextStyle(
@@ -107,7 +113,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const StreakScreen(),
+        home: SharePrefsService.isFirstTime()
+            ? OnBoardingScreen()
+            : const StreakScreen(),
       ),
     );
   }
