@@ -21,7 +21,7 @@ void main() async {
   await NotificationService.initializeNotifications();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      statusBarColor: AppColors.blackColor,
+      statusBarColor: AppColors.primaryColor,
       statusBarIconBrightness: Brightness.dark,
     ),
   );

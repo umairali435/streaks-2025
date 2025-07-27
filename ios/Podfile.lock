@@ -4,9 +4,9 @@ PODS:
     - Flutter
   - fluttertoast (0.0.2):
     - Flutter
-  - home_widget (0.0.1):
+  - gallery_saver_plus (0.0.1):
     - Flutter
-  - image_gallery_saver (2.0.2):
+  - home_widget (0.0.1):
     - Flutter
   - isar_flutter_libs (1.0.0):
     - Flutter
@@ -36,8 +36,8 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - gallery_saver_plus (from `.symlinks/plugins/gallery_saver_plus/ios`)
   - home_widget (from `.symlinks/plugins/home_widget/ios`)
-  - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
   - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
@@ -59,10 +59,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  gallery_saver_plus:
+    :path: ".symlinks/plugins/gallery_saver_plus/ios"
   home_widget:
     :path: ".symlinks/plugins/home_widget/ios"
-  image_gallery_saver:
-    :path: ".symlinks/plugins/image_gallery_saver/ios"
   isar_flutter_libs:
     :path: ".symlinks/plugins/isar_flutter_libs/ios"
   path_provider_foundation:
@@ -84,8 +84,8 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
   fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
+  gallery_saver_plus: 61c8a831d5975e2bf57f87bcd64379dcc7d29ff2
   home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
-  image_gallery_saver: 14711d79da40581063e8842a11acf1969d781ed7
   isar_flutter_libs: 9fc2cfb928c539e1b76c481ba5d143d556d94920
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d

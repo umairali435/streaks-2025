@@ -1,21 +1,23 @@
-import 'dart:typed_data';
 import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ScreenshotService {
   final ScreenshotController _controller = ScreenshotController();
 
   ScreenshotController get controller => _controller;
 
-  /// Save widget screenshot to gallery
+  /// Save widget screenshot to gallery using `gallery_saver_plus`
   Future<void> captureAndSaveToGallery() async {
     try {
-      if (Platform.isAndroid || Platform.isIOS) {
+      if (Platform.isIOS) {
         final status = await Permission.storage.request();
         if (!status.isGranted) {
           Fluttertoast.showToast(msg: "Storage permission denied");
@@ -26,13 +28,13 @@ class ScreenshotService {
       Uint8List? imageBytes = await _controller.capture();
       if (imageBytes == null) throw Exception("Capture failed");
 
-      final result = await ImageGallerySaver.saveImage(
-        imageBytes,
-        quality: 100,
-        name: "screenshot_${DateTime.now().millisecondsSinceEpoch}",
-      );
+      final directory = await getTemporaryDirectory();
+      final imagePath =
+          '${directory.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png';
+      final imageFile = File(imagePath)..writeAsBytesSync(imageBytes);
 
-      if (result['isSuccess'] == true) {
+      final saved = await GallerySaver.saveImage(imageFile.path);
+      if (saved == true) {
         Fluttertoast.showToast(msg: "📸 Screenshot saved to gallery");
       } else {
         Fluttertoast.showToast(msg: "❌ Failed to save screenshot");
@@ -49,13 +51,15 @@ class ScreenshotService {
       Uint8List? imageBytes = await _controller.capture();
       if (imageBytes == null) throw Exception("Capture failed");
 
-      final tempDir = Directory.systemTemp;
+      final tempDir = await getTemporaryDirectory();
       final file = await File('${tempDir.path}/screenshot.png').create();
       await file.writeAsBytes(imageBytes);
 
       await SharePlus.instance.share(
         ShareParams(
-            files: [XFile(file.path)], text: "Checkout my progress here"),
+          files: [XFile(file.path)],
+          text: "Checkout my progress here",
+        ),
       );
     } catch (e) {
       debugPrint("Error sharing screenshot: $e");

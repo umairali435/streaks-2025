@@ -29,115 +29,122 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: BlocBuilder<PurchasesBloc, PurchasesState>(
-          builder: (context, state) {
-            return Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      LucideIcons.chevronLeft,
-                      color: AppColors.whiteColor,
+        child: BlocListener<PurchasesBloc, PurchasesState>(
+          listener: (context, state) {
+            if (state.isSubscriptionActive) {
+              Navigator.pop(context);
+            }
+          },
+          child: BlocBuilder<PurchasesBloc, PurchasesState>(
+            builder: (context, state) {
+              return Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(
+                        LucideIcons.chevronLeft,
+                        color: AppColors.whiteColor,
+                      ),
                     ),
                   ),
-                ),
-                state.isSubscriptionActive
-                    ? Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              LucideIcons.crown,
-                              color: AppColors.primaryColor,
-                            ),
-                            Text(
-                              "You are Subscribe to PRO",
-                              style: TextStyle(
-                                fontSize: 22.0,
-                                color: AppColors.whiteColor,
+                  state.isSubscriptionActive
+                      ? Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                LucideIcons.crown,
+                                color: AppColors.primaryColor,
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Expanded(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            ListView(
-                              padding: EdgeInsets.zero,
-                              children: [
-                                Image.asset(
-                                  'assets/subscription_image.png',
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.30,
+                              Text(
+                                "You are Subscribe to PRO",
+                                style: TextStyle(
+                                  fontSize: 22.0,
+                                  color: AppColors.whiteColor,
                                 ),
-                                const OfferingWidget(),
-                                const Packages(),
-                                const Gap(10.0),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 50.0),
-                                  child: CustomButton(
-                                    radius: 25.0,
-                                    margin: 5.0,
-                                    label: state.selectedIndex == 0
-                                        ? "Start Free Trial"
-                                        : "Buy Subscription",
-                                    onTap: () async {
-                                      if (state.selectedPackage != null) {
-                                        context.read<PurchasesBloc>().add(
-                                            PurchaseSubscription(
-                                                state.selectedPackage!));
-                                      } else {
-                                        Fluttertoast.showToast(
-                                          msg: "Select one package",
-                                          gravity: ToastGravity.BOTTOM,
-                                          backgroundColor: Colors.red,
-                                        );
-                                      }
-                                    },
+                              ),
+                            ],
+                          ),
+                        )
+                      : Expanded(
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              ListView(
+                                padding: EdgeInsets.zero,
+                                children: [
+                                  Image.asset(
+                                    'assets/subscription_image.png',
+                                    height: MediaQuery.of(context).size.height *
+                                        0.30,
                                   ),
-                                ),
-                                TextButton(
-                                  child: Text(
-                                    "Restore Purchases",
-                                    style: TextStyle(
-                                      color: AppColors.primaryColor,
+                                  const OfferingWidget(),
+                                  const Packages(),
+                                  const Gap(10.0),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 50.0),
+                                    child: CustomButton(
+                                      radius: 25.0,
+                                      margin: 5.0,
+                                      label: state.selectedIndex == 0
+                                          ? "Start Free Trial"
+                                          : "Buy Subscription",
+                                      onTap: () async {
+                                        if (state.selectedPackage != null) {
+                                          context.read<PurchasesBloc>().add(
+                                              PurchaseSubscription(
+                                                  state.selectedPackage!));
+                                        } else {
+                                          Fluttertoast.showToast(
+                                            msg: "Select one package",
+                                            gravity: ToastGravity.BOTTOM,
+                                            backgroundColor: Colors.red,
+                                          );
+                                        }
+                                      },
                                     ),
                                   ),
-                                  onPressed: () async {
-                                    context
-                                        .read<PurchasesBloc>()
-                                        .add(RestoreSubscription());
-                                  },
-                                ),
-                                BillingInfoWidget(),
-                              ],
-                            ),
-                            state.isLoading
-                                ? Container(
-                                    padding: const EdgeInsets.all(20.0),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.secondaryColor,
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
+                                  TextButton(
+                                    child: Text(
+                                      "Restore Purchases",
+                                      style: TextStyle(
                                         color: AppColors.primaryColor,
                                       ),
                                     ),
-                                    child: const CustomLoadingWidget(),
-                                  )
-                                : Container(),
-                          ],
+                                    onPressed: () async {
+                                      context
+                                          .read<PurchasesBloc>()
+                                          .add(RestoreSubscription());
+                                    },
+                                  ),
+                                  BillingInfoWidget(),
+                                ],
+                              ),
+                              state.isLoading
+                                  ? Container(
+                                      padding: const EdgeInsets.all(20.0),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.secondaryColor,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: AppColors.primaryColor,
+                                        ),
+                                      ),
+                                      child: const CustomLoadingWidget(),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
                         ),
-                      ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

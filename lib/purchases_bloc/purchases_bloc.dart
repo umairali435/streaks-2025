@@ -30,7 +30,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
     late PurchasesConfiguration configuration;
     if (Platform.isAndroid) {
       configuration =
-          PurchasesConfiguration("goog_FVrtLHMkDutnKdFqQyNdlgAonGs");
+          PurchasesConfiguration("goog_whruziDKNFJomxFBXTXiisBKHBR");
     } else {
       configuration =
           PurchasesConfiguration("appl_KVYUCljoRyvHdMLJNmTqoYPmYQT");
@@ -40,8 +40,11 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
     Purchases.addCustomerInfoUpdateListener((customerInfo) async {});
     CustomerInfo info = await Purchases.getCustomerInfo();
     if (emit.isDone) {
-      emit(state.copyWith(
-          isSubscriptionActive: info.activeSubscriptions.isNotEmpty));
+      emit(
+        state.copyWith(
+          isSubscriptionActive: info.activeSubscriptions.isNotEmpty,
+        ),
+      );
     }
   }
 
@@ -78,14 +81,14 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
     emit(state.copyWith(isLoading: true));
     try {
       await Purchases.purchasePackage(event.package);
-      emit(state.copyWith(isLoading: false));
+      emit(state.copyWith(isLoading: false, isSubscriptionActive: true));
       Fluttertoast.showToast(
         msg: "Your Purchase is Successfull",
         gravity: ToastGravity.TOP,
         backgroundColor: Colors.green,
       );
     } on PlatformException catch (e) {
-      emit(state.copyWith(isLoading: false, isSubscriptionActive: true));
+      emit(state.copyWith(isLoading: false));
       Fluttertoast.showToast(
         msg: e.message.toString(),
         gravity: ToastGravity.BOTTOM,

@@ -26,6 +26,7 @@ class StreakDetailScreen extends StatefulWidget {
 }
 
 class _StreakDetailScreenState extends State<StreakDetailScreen> {
+  int longestStreak = 0;
   int calculateLongestStreak(List<DateTime> streakDates) {
     if (streakDates.isEmpty) return 0;
 
@@ -48,9 +49,20 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    int longestStreak = calculateLongestStreak(widget.streak.streakDates);
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final result = calculateLongestStreak(widget.streak.streakDates);
+      if (mounted) {
+        setState(() {
+          longestStreak = result;
+        });
+      }
+    });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

@@ -11,7 +11,7 @@ class PurchasesState extends Equatable {
 
   const PurchasesState({
     this.isLoading = false,
-    this.isSubscriptionActive = true,
+    this.isSubscriptionActive = false,
     this.offerings = const [],
     this.selectedPackage,
     this.selectedIndex = 0,

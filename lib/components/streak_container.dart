@@ -71,8 +71,8 @@ class StreakContainer extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       int weekDay = AppConstants.getWeekDay(DateTime.now());
-                      bool isDayActive =
-                          streak.selectedDays.contains(weekDay + 1);
+                      bool isDayActive = streak.selectedDays.contains(weekDay);
+                      debugPrint(isDayActive.toString());
                       if (isDayActive && isTodayChecked) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
