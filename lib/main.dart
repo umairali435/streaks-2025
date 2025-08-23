@@ -11,14 +11,12 @@ import 'package:streaks/screen/onboarding_screen.dart';
 import 'package:streaks/screen/streak_screen.dart';
 import 'package:streaks/database/streaks_database.dart';
 import 'package:streaks/screen/add_screen.dart';
-import 'package:streaks/services/notification_service.dart';
 import 'package:streaks/services/share_prefs_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharePrefsService.init();
   await StreaksDatabase.init();
-  await NotificationService.initializeNotifications();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       statusBarColor: AppColors.primaryColor,

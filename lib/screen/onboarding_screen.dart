@@ -9,6 +9,7 @@ import 'package:streaks/res/colors.dart';
 import 'package:streaks/screen/purchases_screen.dart';
 import 'package:streaks/screen/streak_details/widgets/custom_button.dart';
 import 'package:streaks/screen/streak_screen.dart';
+import 'package:streaks/services/notification_service.dart';
 import 'package:streaks/services/share_prefs_services.dart';
 
 class OnBoardingScreen extends StatefulWidget {
@@ -21,8 +22,13 @@ class OnBoardingScreen extends StatefulWidget {
 class _OnBoardingScreenState extends State<OnBoardingScreen> {
   @override
   void initState() {
+    _initNotification();
     context.read<PurchasesBloc>().add(InitPurchases());
     super.initState();
+  }
+
+  _initNotification() async {
+    await NotificationService.initializeNotifications();
   }
 
   final PageController _pageController = PageController();
