@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:streaks/res/constants.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -9,9 +10,17 @@ class NotificationService {
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  static Future<void> initializeNotifications() async {
+  static Future<void> initilizeTime() async {
     tz.initializeTimeZones();
+    try {
+      final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(currentTimeZone));
+    } catch (e) {
+      tz.setLocalLocation(tz.getLocation('UTC'));
+    }
+  }
 
+  static Future<void> initializeNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('notification_icon');
 
@@ -41,12 +50,19 @@ class NotificationService {
   static Future<void> scheduleDailyNotification(TimeOfDay? time,
       {String? streakName}) async {
     final now = DateTime.now();
+
     final notificationTime = DateTime(
-        now.year, now.month, now.day, time?.hour ?? 0, time?.minute ?? 0);
+      now.year,
+      now.month,
+      now.day,
+      time?.hour ?? 0,
+      time?.minute ?? 0,
+    );
 
     final tz.TZDateTime tzNotificationTime =
         tz.TZDateTime.from(notificationTime, tz.local);
-    debugPrint(tzNotificationTime.toString());
+
+    debugPrint("Scheduled notification at: $tzNotificationTime");
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(

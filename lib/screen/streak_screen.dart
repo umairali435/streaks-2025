@@ -2,15 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:streaks/bloc/streaks_bloc.dart';
 import 'package:streaks/components/streak_container.dart';
 import 'package:streaks/database/streaks_database.dart';
+import 'package:streaks/purchases_bloc/purchases_bloc.dart';
+import 'package:streaks/purchases_bloc/purchases_state.dart';
 import 'package:streaks/res/assets.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/res/strings.dart';
 import 'package:streaks/screen/add_screen.dart';
+import 'package:streaks/screen/premium_user.dart';
 import 'package:streaks/screen/purchases_screen.dart';
 import 'package:streaks/screen/streak_details/streak_detail_screen.dart';
+import 'package:streaks/screen/support_screen.dart';
+import 'package:streaks/screen/updates_screen.dart';
+import 'package:streaks/services/share_prefs_services.dart';
 import 'package:streaks/services/url_launcher_service.dart';
 
 class StreakScreen extends StatefulWidget {
@@ -21,6 +28,55 @@ class StreakScreen extends StatefulWidget {
 }
 
 class _StreakScreenState extends State<StreakScreen> {
+  @override
+  void initState() {
+    _checkAndShowWhatsNew();
+    super.initState();
+  }
+
+  Future<void> _checkAndShowWhatsNew() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    bool shouldShow = await SharePrefsService.shouldShowWhatsNew();
+
+    if (shouldShow && mounted) {
+      _showWhatsNewDialog();
+    }
+  }
+
+  void _showWhatsNewDialog() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WhatsNewDialog(
+          version: packageInfo.version,
+          updates: const [
+            UpdateItem(
+              title: 'Fixed Habit Creation Issues',
+              description:
+                  'Resolved problems with multiple habit additions that occurred when reopening the app.',
+              type: UpdateType.bugfix,
+            ),
+            UpdateItem(
+              title: 'Premium Status Fixed',
+              description:
+                  'Fixed issue where premium subscription prompts kept appearing after successful purchase.',
+              type: UpdateType.bugfix,
+            ),
+            UpdateItem(
+              title: 'Contact Developer Support',
+              description:
+                  'Added a new support option to easily contact the developer for help and feedback.',
+              type: UpdateType.feature,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +99,8 @@ class _StreakScreenState extends State<StreakScreen> {
             if (value == 'privacy_policy') {
               await UrlLauncherService.launchURL(AppText.privacyPolicy);
             } else if (value == 'support') {
-              await UrlLauncherService.launchURL(AppText.support);
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => SupportPage()));
             }
           },
           itemBuilder: (BuildContext context) {
@@ -60,17 +117,29 @@ class _StreakScreenState extends State<StreakScreen> {
           },
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const PurchasesScreen(),
+          BlocBuilder<PurchasesBloc, PurchasesState>(
+            builder: (context, state) {
+              return IconButton(
+                onPressed: () {
+                  if (state.isSubscriptionActive) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const AlreadyPremiumPage(),
+                      ),
+                    );
+                  } else {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const PurchasesScreen(),
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(
+                  LucideIcons.crown,
                 ),
               );
             },
-            icon: const Icon(
-              LucideIcons.crown,
-            ),
           ),
           IconButton(
             onPressed: () {

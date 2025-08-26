@@ -45,6 +45,14 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   void initState() {
     context.read<PurchasesBloc>().add(TotalAddedStreaks(0));
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((value) {
+      _setSelectedTime();
+    });
+  }
+
+  _setSelectedTime() {
+    selectedTime = TimeOfDay.now();
+    timeController.text = selectedTime?.format(context) ?? "";
   }
 
   @override
