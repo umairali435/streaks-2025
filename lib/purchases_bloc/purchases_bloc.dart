@@ -39,8 +39,6 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
 
     Purchases.addCustomerInfoUpdateListener((customerInfo) async {});
     CustomerInfo info = await Purchases.getCustomerInfo();
-    debugPrint("I am here now");
-    debugPrint(info.activeSubscriptions.toString());
     emit(
       state.copyWith(
         isSubscriptionActive: info.activeSubscriptions.isNotEmpty,

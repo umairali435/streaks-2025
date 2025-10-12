@@ -61,9 +61,6 @@ class NotificationService {
 
     final tz.TZDateTime tzNotificationTime =
         tz.TZDateTime.from(notificationTime, tz.local);
-
-    debugPrint("Scheduled notification at: $tzNotificationTime");
-
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'daily_notification_channel_id',

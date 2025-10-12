@@ -93,7 +93,7 @@ const StreakSchema = CollectionSchema(
   getId: _streakGetId,
   getLinks: _streakGetLinks,
   attach: _streakAttach,
-  version: '3.1.0+1',
+  version: '3.3.0-dev.3',
 );
 
 int _streakEstimateSize(

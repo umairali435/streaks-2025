@@ -12,7 +12,9 @@ PODS:
     - Flutter
   - home_widget (0.0.1):
     - Flutter
-  - isar_flutter_libs (1.0.0):
+  - in_app_review (2.0.0):
+    - Flutter
+  - isar_community_flutter_libs (1.0.0):
     - Flutter
   - package_info_plus (0.4.5):
     - Flutter
@@ -46,7 +48,8 @@ DEPENDENCIES:
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gallery_saver_plus (from `.symlinks/plugins/gallery_saver_plus/ios`)
   - home_widget (from `.symlinks/plugins/home_widget/ios`)
-  - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
+  - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
+  - isar_community_flutter_libs (from `.symlinks/plugins/isar_community_flutter_libs/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
@@ -76,8 +79,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/gallery_saver_plus/ios"
   home_widget:
     :path: ".symlinks/plugins/home_widget/ios"
-  isar_flutter_libs:
-    :path: ".symlinks/plugins/isar_flutter_libs/ios"
+  in_app_review:
+    :path: ".symlinks/plugins/in_app_review/ios"
+  isar_community_flutter_libs:
+    :path: ".symlinks/plugins/isar_community_flutter_libs/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
@@ -103,7 +108,8 @@ SPEC CHECKSUMS:
   fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
   gallery_saver_plus: 61c8a831d5975e2bf57f87bcd64379dcc7d29ff2
   home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
-  isar_flutter_libs: 9fc2cfb928c539e1b76c481ba5d143d556d94920
+  in_app_review: 7dd1ea365263f834b8464673f9df72c80c17c937
+  isar_community_flutter_libs: bede843185a61a05ff364a05c9b23209523f7e0d
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d

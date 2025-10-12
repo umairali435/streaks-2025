@@ -6,6 +6,7 @@ import 'package:streaks/purchases_bloc/purchases_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_event.dart';
 import 'package:streaks/res/assets.dart';
 import 'package:streaks/res/colors.dart';
+import 'package:streaks/screen/add_screen.dart';
 import 'package:streaks/screen/purchases_screen.dart';
 import 'package:streaks/screen/streak_details/widgets/custom_button.dart';
 import 'package:streaks/screen/streak_screen.dart';
@@ -109,6 +110,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => StreakScreen()),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddStrekScreen()),
                   );
                   Navigator.push(
                     context,

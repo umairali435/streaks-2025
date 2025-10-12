@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:streaks/bloc/streaks_bloc.dart';
 import 'package:streaks/res/colors.dart';
@@ -19,6 +20,13 @@ class StreakContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> showReviewAfterSeedScan() async {
+      final InAppReview inAppReview = InAppReview.instance;
+      if (await inAppReview.isAvailable()) {
+        inAppReview.requestReview();
+      }
+    }
+
     DateTime today = DateTime.now();
     DateTime todayWithoutTime = DateTime(today.year, today.month, today.day);
     bool isTodayChecked = streak.streakDates.contains(todayWithoutTime);
@@ -90,6 +98,7 @@ class StreakContainer extends StatelessWidget {
                         context
                             .read<StreaksBloc>()
                             .add(AddStreakDate(streak.id, todayWithoutTime));
+                        showReviewAfterSeedScan();
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

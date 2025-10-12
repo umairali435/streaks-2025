@@ -440,17 +440,16 @@ class _PurchasesScreenState extends State<PurchasesScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  state.selectedIndex == 0
-                      ? LucideIcons.gift
-                      : LucideIcons.creditCard,
+                  LucideIcons.creditCard,
                   color: Colors.black,
                   size: 24,
                 ),
                 const Gap(12),
                 Text(
-                  state.selectedIndex == 0
-                      ? "Start Free Trial"
-                      : "Buy Subscription",
+                  // state.selectedIndex == 0
+                  //     ? "Start Free Trial"
+                  //     : "Buy Subscription",
+                  "Buy Subscription",
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -554,6 +553,12 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  double calculateSavingsPercentage(double weeklyPrice, double yearlyPrice) {
+    double totalWeeklyCost = weeklyPrice * 52;
+    double savings = 1 - (yearlyPrice / totalWeeklyCost);
+    return savings * 100;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PurchasesBloc, PurchasesState>(
@@ -563,19 +568,23 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
           child: Column(
             children: state.offerings.map(
               (offers) {
+                int percentage = calculateSavingsPercentage(
+                  offers.weekly?.storeProduct.price ?? 0.0,
+                  offers.annual?.storeProduct.price ?? 0.0,
+                ).toInt();
                 return Column(
                   children: [
                     PackagesWidgets(
-                      title: "3 Days Free Trial",
+                      title: "WEEKLY PLAN",
                       subtitle:
-                          "then ${offers.monthly?.storeProduct.currencyCode} ${offers.monthly?.storeProduct.price.toStringAsFixed(2)} / Month",
-                      showTryForFree: true,
+                          "${offers.weekly?.storeProduct.currencyCode} ${offers.weekly?.storeProduct.price.toStringAsFixed(2)} / Week",
+                      showTryForFree: false,
                       selectedPackage: state.selectedIndex == 0 ? true : false,
                       showPercentage: false,
                       onTap: () async {
                         context
                             .read<PurchasesBloc>()
-                            .add(SelectPackage(offers.monthly!, 0));
+                            .add(SelectPackage(offers.weekly!, 0));
                       },
                     ),
                     const Gap(15),
@@ -588,7 +597,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                       showTryForFree: false,
                       selectedPackage: state.selectedIndex == 1 ? true : false,
                       showPercentage: true,
-                      percentage: "50",
+                      percentage: percentage.toInt().toString(),
                       onTap: () async {
                         context
                             .read<PurchasesBloc>()
@@ -889,11 +898,12 @@ class _BillingInfoWidgetState extends State<BillingInfoWidget> {
         return Column(
           children: [
             Text(
-              state.selectedIndex == 0
-                  ? state.offerings.isNotEmpty
-                      ? "3 days free trial, then ${state.offerings[0].monthly?.storeProduct.currencyCode} ${state.offerings[0].monthly?.storeProduct.price.toStringAsFixed(2)} / Month. Cancel anytime before trial ends."
-                      : ""
-                  : "Auto renewable subscription. Cancel anytime from your account settings.",
+              // state.selectedIndex == 0
+              // ? state.offerings.isNotEmpty
+              // ? "3 days free trial, then ${state.offerings[0].monthly?.storeProduct.currencyCode} ${state.offerings[0].monthly?.storeProduct.price.toStringAsFixed(2)} / Month. Cancel anytime before trial ends."
+              // : ""
+              // :
+              "Auto renewable subscription. Cancel anytime from your account settings.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 color: Colors.grey.shade400,

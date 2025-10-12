@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:streaks/database/streaks_database.dart';
 
 part 'streaks_event.dart';
@@ -15,7 +15,8 @@ class StreaksBloc extends Bloc<StreaksEvent, StreaksState> {
     on<AddStreakDate>(_onAddStreakDate);
   }
 
-  Future<void> _onLoadStreaks(LoadStreaks event, Emitter<StreaksState> emit) async {
+  Future<void> _onLoadStreaks(
+      LoadStreaks event, Emitter<StreaksState> emit) async {
     emit(StreaksLoading());
     try {
       final streaks = await StreaksDatabase.getAllStreaks();
@@ -34,7 +35,8 @@ class StreaksBloc extends Bloc<StreaksEvent, StreaksState> {
     }
   }
 
-  Future<void> _onUpdateStreak(UpdateStreak event, Emitter<StreaksState> emit) async {
+  Future<void> _onUpdateStreak(
+      UpdateStreak event, Emitter<StreaksState> emit) async {
     try {
       await StreaksDatabase.addStreak(event.streak);
       add(LoadStreaks());
@@ -43,7 +45,8 @@ class StreaksBloc extends Bloc<StreaksEvent, StreaksState> {
     }
   }
 
-  Future<void> _onDeleteStreak(DeleteStreak event, Emitter<StreaksState> emit) async {
+  Future<void> _onDeleteStreak(
+      DeleteStreak event, Emitter<StreaksState> emit) async {
     try {
       await StreaksDatabase.deleteStreakById(event.id);
       add(LoadStreaks());
@@ -52,7 +55,8 @@ class StreaksBloc extends Bloc<StreaksEvent, StreaksState> {
     }
   }
 
-  Future<void> _onAddStreakDate(AddStreakDate event, Emitter<StreaksState> emit) async {
+  Future<void> _onAddStreakDate(
+      AddStreakDate event, Emitter<StreaksState> emit) async {
     try {
       await StreaksDatabase.addStreakDate(event.id, event.date);
       add(LoadStreaks());

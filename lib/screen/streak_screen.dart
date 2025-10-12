@@ -54,21 +54,9 @@ class _StreakScreenState extends State<StreakScreen> {
           version: packageInfo.version,
           updates: const [
             UpdateItem(
-              title: 'Fixed Habit Creation Issues',
+              title: 'Rate App',
               description:
-                  'Resolved problems with multiple habit additions that occurred when reopening the app.',
-              type: UpdateType.bugfix,
-            ),
-            UpdateItem(
-              title: 'Premium Status Fixed',
-              description:
-                  'Fixed issue where premium subscription prompts kept appearing after successful purchase.',
-              type: UpdateType.bugfix,
-            ),
-            UpdateItem(
-              title: 'Contact Developer Support',
-              description:
-                  'Added a new support option to easily contact the developer for help and feedback.',
+                  'Added a new feature to rate the app when you complete one streak',
               type: UpdateType.feature,
             ),
           ],
