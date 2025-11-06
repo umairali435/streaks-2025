@@ -13,6 +13,7 @@ class StreaksBloc extends Bloc<StreaksEvent, StreaksState> {
     on<UpdateStreak>(_onUpdateStreak);
     on<DeleteStreak>(_onDeleteStreak);
     on<AddStreakDate>(_onAddStreakDate);
+    on<RemoveStreakDate>(_onRemoveStreakDate);
   }
 
   Future<void> _onLoadStreaks(
@@ -59,6 +60,16 @@ class StreaksBloc extends Bloc<StreaksEvent, StreaksState> {
       AddStreakDate event, Emitter<StreaksState> emit) async {
     try {
       await StreaksDatabase.addStreakDate(event.id, event.date);
+      add(LoadStreaks());
+    } catch (e) {
+      emit(StreaksError(e.toString()));
+    }
+  }
+
+  Future<void> _onRemoveStreakDate(
+      RemoveStreakDate event, Emitter<StreaksState> emit) async {
+    try {
+      await StreaksDatabase.removeStreakDate(event.id, event.date);
       add(LoadStreaks());
     } catch (e) {
       emit(StreaksError(e.toString()));

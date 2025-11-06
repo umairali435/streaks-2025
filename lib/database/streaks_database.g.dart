@@ -66,6 +66,11 @@ const StreakSchema = CollectionSchema(
       id: 9,
       name: r'streakDates',
       type: IsarType.dateTimeList,
+    ),
+    r'unlockedBadges': PropertySchema(
+      id: 10,
+      name: r'unlockedBadges',
+      type: IsarType.longList,
     )
   },
   estimateSize: _streakEstimateSize,
@@ -112,6 +117,12 @@ int _streakEstimateSize(
   bytesCount += 3 + object.name.length * 3;
   bytesCount += 3 + object.selectedDays.length * 8;
   bytesCount += 3 + object.streakDates.length * 8;
+  {
+    final value = object.unlockedBadges;
+    if (value != null) {
+      bytesCount += 3 + value.length * 8;
+    }
+  }
   return bytesCount;
 }
 
@@ -131,6 +142,7 @@ void _streakSerialize(
   writer.writeLongList(offsets[7], object.selectedDays);
   writer.writeLong(offsets[8], object.selectedWeek);
   writer.writeDateTimeList(offsets[9], object.streakDates);
+  writer.writeLongList(offsets[10], object.unlockedBadges);
 }
 
 Streak _streakDeserialize(
@@ -150,6 +162,7 @@ Streak _streakDeserialize(
     selectedDays: reader.readLongList(offsets[7]) ?? [],
     selectedWeek: reader.readLong(offsets[8]),
     streakDates: reader.readDateTimeList(offsets[9]) ?? [],
+    unlockedBadges: reader.readLongList(offsets[10]),
   );
   object.id = id;
   return object;
@@ -182,6 +195,8 @@ P _streakDeserializeProp<P>(
       return (reader.readLong(offset)) as P;
     case 9:
       return (reader.readDateTimeList(offset) ?? []) as P;
+    case 10:
+      return (reader.readLongList(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1320,6 +1335,167 @@ extension StreakQueryFilter on QueryBuilder<Streak, Streak, QFilterCondition> {
       );
     });
   }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition> unlockedBadgesIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'unlockedBadges',
+      ));
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'unlockedBadges',
+      ));
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesElementEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'unlockedBadges',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesElementGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'unlockedBadges',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesElementLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'unlockedBadges',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesElementBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'unlockedBadges',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedBadges',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition> unlockedBadgesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedBadges',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedBadges',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedBadges',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedBadges',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Streak, Streak, QAfterFilterCondition>
+      unlockedBadgesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'unlockedBadges',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
 }
 
 extension StreakQueryObject on QueryBuilder<Streak, Streak, QFilterCondition> {}
@@ -1571,6 +1747,12 @@ extension StreakQueryWhereDistinct on QueryBuilder<Streak, Streak, QDistinct> {
       return query.addDistinctBy(r'streakDates');
     });
   }
+
+  QueryBuilder<Streak, Streak, QDistinct> distinctByUnlockedBadges() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'unlockedBadges');
+    });
+  }
 }
 
 extension StreakQueryProperty on QueryBuilder<Streak, Streak, QQueryProperty> {
@@ -1637,6 +1819,12 @@ extension StreakQueryProperty on QueryBuilder<Streak, Streak, QQueryProperty> {
   QueryBuilder<Streak, List<DateTime>, QQueryOperations> streakDatesProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'streakDates');
+    });
+  }
+
+  QueryBuilder<Streak, List<int>?, QQueryOperations> unlockedBadgesProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'unlockedBadges');
     });
   }
 }

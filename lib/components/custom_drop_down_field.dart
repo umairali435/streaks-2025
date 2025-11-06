@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:streaks/bloc/theme_bloc.dart';
 import 'package:streaks/components/custom_text_field.dart';
 import 'package:streaks/res/colors.dart';
 
@@ -55,33 +57,39 @@ class _CustomDropDownFieldState extends State<CustomDropDownField> {
           onChanged: widget.onChanged,
           onSaved: widget.onSaved,
         ),
-        AnimatedCrossFade(
-          firstChild: Container(),
-          secondChild: Container(
-            margin: const EdgeInsets.only(bottom: 10.0),
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            decoration: BoxDecoration(
-              color: AppColors.cardColor,
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: _CustomListTile(
-              data: widget.items,
-              onChanged: (value) {
-                isShowDropDown = !isShowDropDown;
-                selectedValue = value;
-                controller.text = value;
-                if (widget.onChanged != null) {
-                  widget.onChanged!(value);
-                }
-                setState(() {});
-              },
-              selectedValue: widget.controller?.text ?? selectedValue,
-            ),
-          ),
-          crossFadeState: isShowDropDown
-              ? CrossFadeState.showSecond
-              : CrossFadeState.showFirst,
-          duration: const Duration(milliseconds: 200),
+        BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (context, themeState) {
+            final isDark = themeState is ThemeLoaded ? themeState.isDark : true;
+            return AnimatedCrossFade(
+              firstChild: Container(),
+              secondChild: Container(
+                margin: const EdgeInsets.only(bottom: 10.0),
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                decoration: BoxDecoration(
+                  color: AppColors.cardColorTheme(isDark),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: _CustomListTile(
+                  data: widget.items,
+                  isDark: isDark,
+                  onChanged: (value) {
+                    isShowDropDown = !isShowDropDown;
+                    selectedValue = value;
+                    controller.text = value;
+                    if (widget.onChanged != null) {
+                      widget.onChanged!(value);
+                    }
+                    setState(() {});
+                  },
+                  selectedValue: widget.controller?.text ?? selectedValue,
+                ),
+              ),
+              crossFadeState: isShowDropDown
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 200),
+            );
+          },
         ),
       ],
     );
@@ -92,10 +100,12 @@ class _CustomListTile extends StatefulWidget {
   final List<String> data;
   final Function(String)? onChanged;
   final String selectedValue;
+  final bool isDark;
   const _CustomListTile({
     required this.data,
     required this.onChanged,
     required this.selectedValue,
+    required this.isDark,
   });
 
   @override
@@ -132,7 +142,7 @@ class _CustomListTileState extends State<_CustomListTile> {
                                 color:
                                     widget.selectedValue == widget.data[index]
                                         ? AppColors.primaryColor
-                                        : AppColors.whiteColor,
+                                        : AppColors.textColor(widget.isDark),
                               ),
                             ),
                           ),
@@ -141,7 +151,7 @@ class _CustomListTileState extends State<_CustomListTile> {
                     ),
                     if (index + 1 != widget.data.length)
                       Divider(
-                        color: AppColors.greyColor.withAlpha(100),
+                        color: AppColors.greyColorTheme(widget.isDark).withAlpha(100),
                       )
                   ],
                 ),

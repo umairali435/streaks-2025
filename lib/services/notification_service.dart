@@ -85,4 +85,13 @@ class NotificationService {
       payload: 'Daily Notification',
     );
   }
+
+  /// Cancel notification for a specific streak by its name
+  static Future<void> cancelNotificationForStreak(String streakName) async {
+    try {
+      await flutterLocalNotificationsPlugin.cancel(streakName.hashCode);
+    } catch (e) {
+      debugPrint("Error canceling notification for streak: $e");
+    }
+  }
 }

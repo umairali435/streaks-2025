@@ -58,7 +58,8 @@ class ScreenshotService {
       await SharePlus.instance.share(
         ShareParams(
           files: [XFile(file.path)],
-          text: "Checkout my progress here",
+          text:
+              "🔥 Check out my streak progress! 💪\n\nJoin me and start building your own streaks with Streaks 2025! Download now and transform your habits into powerful streaks! 🚀",
         ),
       );
     } catch (e) {

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1028646337059",
+    "firebase_url": "https://streaks2025-default-rtdb.firebaseio.com",
+    "project_id": "streaks2025",
+    "storage_bucket": "streaks2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1028646337059:android:3564e6fa6bd9f917940f96",
+        "android_client_info": {
+          "package_name": "com.extendztech.streaks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1028646337059-osbgv8lh45ibvpcrb8igug38u3amf589.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.extendztech.streaks",
+            "certificate_hash": "81eaccc01553fcb52b0b5df839ba223e4b4ce697"
+          }
+        },
+        {
+          "client_id": "1028646337059-4nnqv4rdqmlnt5pnvforveb1un18e3os.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJiZHGnpgxYLFAd2aP5PSOKEYYF5_HfAM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1028646337059-4nnqv4rdqmlnt5pnvforveb1un18e3os.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1028646337059-87ucm4udc4skcl5dpt4fq9rvmlefpkt8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.umair.streaks"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

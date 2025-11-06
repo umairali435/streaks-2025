@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:streaks/bloc/theme_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_event.dart';
 import 'package:streaks/purchases_bloc/purchases_state.dart';
@@ -85,86 +86,33 @@ class _PurchasesScreenState extends State<PurchasesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topCenter,
-            radius: 1.2,
-            colors: [
-              AppColors.primaryColor.withValues(alpha: 0.15),
-              AppColors.primaryColor.withValues(alpha: 0.05),
-              Colors.black,
-            ],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Floating particles background
-            ...List.generate(12, (index) => _buildFloatingParticle(index)),
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, themeState) {
+        final isDark = themeState is ThemeLoaded ? themeState.isDark : true;
+        return Scaffold(
+          backgroundColor: AppColors.backgroundColor(isDark),
+          body: SafeArea(
+            child: BlocBuilder<PurchasesBloc, PurchasesState>(
+              builder: (context, state) {
+                return Column(
+                  children: [
+                    // Custom App Bar
+                    _buildCustomAppBar(isDark),
 
-            // Main content
-            SafeArea(
-              child: BlocBuilder<PurchasesBloc, PurchasesState>(
-                builder: (context, state) {
-                  return Column(
-                    children: [
-                      // Custom App Bar
-                      _buildCustomAppBar(),
-
-                      state.isSubscriptionActive
-                          ? Expanded(child: _buildAlreadySubscribedView())
-                          : Expanded(
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  _buildPurchaseContent(state),
-                                  if (state.isLoading) _buildLoadingOverlay(),
-                                ],
-                              ),
+                    state.isSubscriptionActive
+                        ? Expanded(child: _buildAlreadySubscribedView(isDark))
+                        : Expanded(
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                _buildPurchaseContent(state, isDark),
+                                if (state.isLoading) _buildLoadingOverlay(isDark),
+                              ],
                             ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFloatingParticle(int index) {
-    return AnimatedBuilder(
-      animation: _particleController,
-      builder: (context, child) {
-        final double animationValue =
-            (_particleController.value + index * 0.08) % 1.0;
-        final double x =
-            30 + (index * 35.0) % MediaQuery.of(context).size.width;
-        final double y =
-            MediaQuery.of(context).size.height * (1 - animationValue);
-
-        return Positioned(
-          left: x,
-          top: y,
-          child: Opacity(
-            opacity: 0.4,
-            child: Container(
-              width: 3 + (index % 4) * 1.5,
-              height: 3 + (index % 4) * 1.5,
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryColor.withValues(alpha: 0.6),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
+                          ),
+                  ],
+                );
+              },
             ),
           ),
         );
@@ -172,7 +120,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
     );
   }
 
-  Widget _buildCustomAppBar() {
+  Widget _buildCustomAppBar(bool isDark) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Padding(
@@ -184,7 +132,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.3),
+                  color: AppColors.backgroundColor(isDark).withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: AppColors.primaryColor.withValues(alpha: 0.3),
@@ -192,7 +140,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
                 ),
                 child: Icon(
                   LucideIcons.chevronLeft,
-                  color: AppColors.whiteColor,
+                  color: AppColors.textColor(isDark),
                   size: 20,
                 ),
               ),
@@ -203,7 +151,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: AppColors.textColor(isDark),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -215,7 +163,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
     );
   }
 
-  Widget _buildAlreadySubscribedView() {
+  Widget _buildAlreadySubscribedView(bool isDark) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: AnimatedBuilder(
@@ -246,7 +194,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
                   ),
                   child: Icon(
                     LucideIcons.crown,
-                    color: Colors.black,
+                    color: AppColors.darkBackgroundColor,
                     size: 60,
                   ),
                 ),
@@ -254,7 +202,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
                 ShaderMask(
                   shaderCallback: (bounds) => LinearGradient(
                     colors: [
-                      Colors.white,
+                      AppColors.textColor(isDark),
                       AppColors.primaryColor,
                     ],
                   ).createShader(bounds),
@@ -263,7 +211,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
                     style: GoogleFonts.poppins(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColors.textColor(isDark),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -273,7 +221,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
                   "You're all set with unlimited access",
                   style: GoogleFonts.poppins(
                     fontSize: 16,
-                    color: Colors.grey.shade300,
+                    color: AppColors.greyColorTheme(isDark),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -285,7 +233,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
     );
   }
 
-  Widget _buildPurchaseContent(PurchasesState state) {
+  Widget _buildPurchaseContent(PurchasesState state, bool isDark) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: AnimatedBuilder(
@@ -297,15 +245,15 @@ class _PurchasesScreenState extends State<PurchasesScreen>
               padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
                 const Gap(20),
-                _buildHeroSection(),
+                _buildHeroSection(isDark),
+                const Gap(50),
+                Packages(isDark: isDark),
                 const Gap(30),
-                const Packages(),
-                const Gap(30),
-                _buildPurchaseButton(state),
+                                _buildPurchaseButton(state),
                 const Gap(20),
-                _buildRestoreButton(),
+                _buildRestoreButton(isDark),
                 const Gap(20),
-                const BillingInfoWidget(),
+                BillingInfoWidget(isDark: isDark),
               ],
             ),
           );
@@ -314,88 +262,51 @@ class _PurchasesScreenState extends State<PurchasesScreen>
     );
   }
 
-  Widget _buildHeroSection() {
-    return AnimatedBuilder(
-      animation: _floatingAnimation,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, _floatingAnimation.value),
-          child: Container(
-            height: 150,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryColor.withValues(alpha: 0.2),
-                  AppColors.primaryColor.withValues(alpha: 0.1),
-                ],
+  Widget _buildHeroSection(bool isDark) {
+    return Container(
+      height: 150,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.primaryColor.withValues(alpha: 0.2),
+            AppColors.primaryColor.withValues(alpha: 0.1),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(
+          color: AppColors.primaryColor.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(14.0),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(20),
               ),
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                color: AppColors.primaryColor.withValues(alpha: 0.3),
+              child: Icon(
+                LucideIcons.sparkles,
+                color: AppColors.primaryColor,
+                size: 30,
               ),
             ),
-            child: Stack(
-              children: [
-                Positioned(
-                  right: -20,
-                  top: -20,
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: -30,
-                  bottom: -30,
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                  ),
-                ),
-                // Content
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(14.0),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Icon(
-                          LucideIcons.sparkles,
-                          color: AppColors.primaryColor,
-                          size: 30,
-                        ),
-                      ),
-                      const Gap(20),
-                      Text(
-                        'Unlock Premium Features',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            const Gap(20),
+            Text(
+              'Unlock Premium Features',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textColor(isDark),
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
@@ -464,7 +375,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
     );
   }
 
-  Widget _buildRestoreButton() {
+  Widget _buildRestoreButton(bool isDark) {
     return TextButton(
       onPressed: () async {
         context.read<PurchasesBloc>().add(RestoreSubscription());
@@ -477,14 +388,14 @@ class _PurchasesScreenState extends State<PurchasesScreen>
         children: [
           Icon(
             LucideIcons.rotateCw,
-            color: AppColors.primaryColor,
+            color: isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
             size: 20,
           ),
           const Gap(8),
           Text(
             "Restore Purchases",
             style: GoogleFonts.poppins(
-              color: AppColors.primaryColor,
+              color: isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -494,9 +405,9 @@ class _PurchasesScreenState extends State<PurchasesScreen>
     );
   }
 
-  Widget _buildLoadingOverlay() {
+  Widget _buildLoadingOverlay(bool isDark) {
     return Container(
-      color: Colors.black.withValues(alpha: 0.8),
+      color: AppColors.backgroundColor(isDark).withValues(alpha: 0.8),
       child: Center(
         child: Container(
           padding: const EdgeInsets.all(30),
@@ -520,7 +431,8 @@ class _PurchasesScreenState extends State<PurchasesScreen>
 }
 
 class Packages extends StatefulWidget {
-  const Packages({super.key});
+  final bool isDark;
+  const Packages({super.key, required this.isDark});
 
   @override
   State<Packages> createState() => _PackagesState();
@@ -581,13 +493,14 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                       showTryForFree: false,
                       selectedPackage: state.selectedIndex == 0 ? true : false,
                       showPercentage: false,
+                      isDark: widget.isDark,
                       onTap: () async {
                         context
                             .read<PurchasesBloc>()
                             .add(SelectPackage(offers.weekly!, 0));
                       },
                     ),
-                    const Gap(15),
+                    const Gap(25),
                     PackagesWidgets(
                       title: "YEARLY PLAN",
                       subtitle:
@@ -598,6 +511,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                       selectedPackage: state.selectedIndex == 1 ? true : false,
                       showPercentage: true,
                       percentage: percentage.toInt().toString(),
+                      isDark: widget.isDark,
                       onTap: () async {
                         context
                             .read<PurchasesBloc>()
@@ -616,7 +530,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
 }
 
 class OfferingWidget extends StatelessWidget {
-  const OfferingWidget({super.key});
+  final bool isDark;
+  const OfferingWidget({super.key, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -625,14 +540,14 @@ class OfferingWidget extends StatelessWidget {
         ShaderMask(
           shaderCallback: (bounds) => LinearGradient(
             colors: [
-              Colors.white,
+              AppColors.textColor(isDark),
               AppColors.primaryColor,
             ],
           ).createShader(bounds),
           child: Text(
             'Upgrade to Premium',
             style: GoogleFonts.poppins(
-              color: Colors.white,
+              color: AppColors.textColor(isDark),
               fontSize: 28,
               fontWeight: FontWeight.bold,
             ),
@@ -643,7 +558,7 @@ class OfferingWidget extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           margin: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: AppColors.cardColorTheme(isDark).withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
               color: AppColors.primaryColor.withValues(alpha: 0.2),
@@ -653,7 +568,7 @@ class OfferingWidget extends StatelessWidget {
             'Unlock unlimited habits, advanced analytics, detailed calendar views, custom themes and priority support',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: Colors.grey.shade300,
+              color: AppColors.greyColorTheme(isDark),
               fontSize: 16,
               height: 1.5,
             ),
@@ -672,6 +587,7 @@ class PackagesWidgets extends StatelessWidget {
   final bool selectedPackage;
   final bool showPercentage;
   final String percentage;
+  final bool isDark;
   final VoidCallback onTap;
 
   const PackagesWidgets({
@@ -683,6 +599,7 @@ class PackagesWidgets extends StatelessWidget {
     required this.selectedPackage,
     this.showPercentage = true,
     this.percentage = "",
+    required this.isDark,
     required this.onTap,
   });
 
@@ -706,13 +623,13 @@ class PackagesWidgets extends StatelessWidget {
                   )
                 : null,
             color:
-                selectedPackage ? null : Colors.white.withValues(alpha: 0.05),
+                selectedPackage ? null : (isDark ? AppColors.cardColorTheme(isDark).withValues(alpha: 0.05) : AppColors.cardColorTheme(isDark)),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: selectedPackage
                   ? AppColors.primaryColor
-                  : Colors.grey.withValues(alpha: 0.3),
-              width: selectedPackage ? 2 : 1,
+                  : (isDark ? AppColors.greyColorTheme(isDark).withValues(alpha: 0.3) : AppColors.greyColorTheme(isDark)),
+              width: selectedPackage ? 2 : (isDark ? 1 : 1.5),
             ),
             boxShadow: selectedPackage
                 ? [
@@ -740,8 +657,8 @@ class PackagesWidgets extends StatelessWidget {
                                   AppColors.primaryColor.withValues(alpha: 0.8),
                                 ]
                               : [
-                                  Colors.grey.shade800,
-                                  Colors.grey.shade700,
+                                  AppColors.secondaryColorTheme(isDark),
+                                  AppColors.secondaryColorTheme(isDark).withValues(alpha: 0.8),
                                 ],
                         ),
                         borderRadius: const BorderRadius.only(
@@ -755,7 +672,7 @@ class PackagesWidgets extends StatelessWidget {
                           Icon(
                             LucideIcons.gift,
                             color:
-                                selectedPackage ? Colors.black : Colors.white,
+                                selectedPackage ? AppColors.darkBackgroundColor : AppColors.textColor(isDark),
                             size: 16,
                           ),
                           const Gap(5),
@@ -763,7 +680,7 @@ class PackagesWidgets extends StatelessWidget {
                             "Try for free",
                             style: GoogleFonts.poppins(
                               color:
-                                  selectedPackage ? Colors.black : Colors.white,
+                                  selectedPackage ? AppColors.darkBackgroundColor : AppColors.textColor(isDark),
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
@@ -782,7 +699,7 @@ class PackagesWidgets extends StatelessWidget {
                               child: Text(
                                 title,
                                 style: GoogleFonts.poppins(
-                                  color: Colors.white,
+                                  color: AppColors.textColor(isDark),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20,
                                 ),
@@ -797,7 +714,7 @@ class PackagesWidgets extends StatelessWidget {
                               Text(
                                 "$oldPrice ",
                                 style: GoogleFonts.poppins(
-                                  color: Colors.grey.shade500,
+                                  color: AppColors.greyColorTheme(isDark),
                                   decoration: TextDecoration.lineThrough,
                                   decorationColor: AppColors.primaryColor,
                                   decorationThickness: 2.0,
@@ -808,7 +725,7 @@ class PackagesWidgets extends StatelessWidget {
                             Text(
                               subtitle,
                               style: GoogleFonts.poppins(
-                                color: Colors.white,
+                                color: AppColors.textColor(isDark),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -847,7 +764,7 @@ class PackagesWidgets extends StatelessWidget {
                     child: Text(
                       "Save $percentage%",
                       style: GoogleFonts.poppins(
-                        color: Colors.black,
+                        color: AppColors.darkBackgroundColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -864,7 +781,7 @@ class PackagesWidgets extends StatelessWidget {
                         color: AppColors.primaryColor, shape: BoxShape.circle),
                     child: Icon(
                       LucideIcons.check,
-                      color: Colors.black,
+                      color: AppColors.darkBackgroundColor,
                       size: 16,
                     ),
                   ),
@@ -878,7 +795,8 @@ class PackagesWidgets extends StatelessWidget {
 }
 
 class BillingInfoWidget extends StatefulWidget {
-  const BillingInfoWidget({super.key});
+  final bool isDark;
+  const BillingInfoWidget({super.key, required this.isDark});
 
   @override
   State<BillingInfoWidget> createState() => _BillingInfoWidgetState();
@@ -906,7 +824,7 @@ class _BillingInfoWidgetState extends State<BillingInfoWidget> {
               "Auto renewable subscription. Cancel anytime from your account settings.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                color: Colors.grey.shade400,
+                color: AppColors.greyColorTheme(widget.isDark),
                 fontSize: 13,
                 height: 1.4,
               ),
@@ -919,13 +837,17 @@ class _BillingInfoWidgetState extends State<BillingInfoWidget> {
                   "Privacy Policy",
                   LucideIcons.shield,
                   () => _launchURL(
-                      "https://earningstrackerapp.blogspot.com/2024/08/sawizier-earnings-tracker-privacy-policy.html"),
+                    "https://streaks2025.blogspot.com/2025/01/privacy-policy.html",
+                  ),
+                  widget.isDark,
                 ),
                 _buildLegalButton(
                   "Terms of Use",
                   LucideIcons.fileText,
                   () => _launchURL(
-                      "https://earningstrackerapp.blogspot.com/2024/11/sawizier-terms-of-use.html"),
+                    "https://streaks2025.blogspot.com/2025/11/streaks-2025-terms-of-use.html",
+                  ),
+                  widget.isDark,
                 ),
               ],
             ),
@@ -935,18 +857,18 @@ class _BillingInfoWidgetState extends State<BillingInfoWidget> {
     );
   }
 
-  Widget _buildLegalButton(String text, IconData icon, VoidCallback onPressed) {
+  Widget _buildLegalButton(String text, IconData icon, VoidCallback onPressed, bool isDark) {
     return TextButton.icon(
       onPressed: onPressed,
       icon: Icon(
         icon,
-        color: AppColors.primaryColor,
+        color: isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
         size: 16,
       ),
       label: Text(
         text,
         style: GoogleFonts.poppins(
-          color: AppColors.primaryColor,
+          color: isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),

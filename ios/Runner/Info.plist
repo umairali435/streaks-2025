@@ -62,5 +62,16 @@
 		<string>This app needs permission to access your photo library to save and share screenshots.</string>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>CFBundleURLTypes</key>
+		<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+			<string>com.googleusercontent.apps.1028646337059-87ucm4udc4skcl5dpt4fq9rvmlefpkt8</string>
+			</array>
+		</dict>
+		</array>	
 	</dict>
 </plist>

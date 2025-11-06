@@ -1,4 +1,3 @@
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -12,6 +11,7 @@ import 'package:streaks/database/streaks_database.dart';
 import 'package:streaks/purchases_bloc/purchases_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_event.dart';
 import 'package:streaks/purchases_bloc/purchases_state.dart';
+import 'package:streaks/bloc/theme_bloc.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/res/constants.dart';
 import 'package:streaks/res/strings.dart';
@@ -35,9 +35,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   int selectedWeekIndex = 0;
   String selectedDaysPerWeek = "7";
   List<int> activeDays = [];
-  int selectedColorCode = AppConstants.colors.first.value32bit;
+  int selectedColorCode = AppConstants.colors.first.toARGB32();
   int selectedContainerColorCode =
-      AppConstants.primaryContainerColors.first.value32bit;
+      AppConstants.primaryContainerColors.first.toARGB32();
   int currentIndex = 0;
   TimeOfDay? selectedTime;
 
@@ -90,320 +90,354 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.blackColor,
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            LucideIcons.chevronLeft,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        title: Text(
-          widget.streak == null ? "Add New Streak" : "Edit Streak",
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w700,
-            fontSize: 18.0,
-          ),
-        ),
-        actions: [
-          BlocBuilder<PurchasesBloc, PurchasesState>(
-            builder: (context, state) {
-              return IconButton(
-                onPressed: () {
-                  if (state.totalStreaksLength > 3 &&
-                      !state.isSubscriptionActive) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PurchasesScreen()),
-                    );
-                  } else {
-                    _saveStreak();
-                  }
-                },
-                icon: const Icon(
-                  LucideIcons.checkCircle,
-                ),
-              );
-            },
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(
-          left: 14.0,
-          right: 14.0,
-          bottom: 20.0,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Gap(20.0),
-            CustomTextField(
-              controller: nameController,
-              title: "Streak name",
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.cardColor,
-                borderRadius: BorderRadius.circular(10.0),
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, themeState) {
+        final isDark = themeState is ThemeLoaded ? themeState.isDark : true;
+        return Scaffold(
+          backgroundColor: AppColors.backgroundColor(isDark),
+          appBar: AppBar(
+            elevation: 0,
+            centerTitle: true,
+            leading: IconButton(
+              icon: Icon(
+                LucideIcons.chevronLeft,
+                color: AppColors.darkBackgroundColor,
               ),
-              child: Column(
-                children: [
-                  Row(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            title: Text(
+              widget.streak == null ? "Add New Streak" : "Edit Streak",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w700,
+                fontSize: 18.0,
+                color: AppColors.darkBackgroundColor,
+              ),
+            ),
+            actions: [
+              BlocBuilder<PurchasesBloc, PurchasesState>(
+                builder: (context, state) {
+                  return IconButton(
+                    onPressed: () {
+                      if (state.totalStreaksLength >= 3 &&
+                          !state.isSubscriptionActive) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PurchasesScreen()),
+                        );
+                      } else {
+                        _saveStreak();
+                      }
+                    },
+                    icon: Icon(
+                      LucideIcons.checkCircle,
+                      color: AppColors.darkBackgroundColor,
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.only(
+              left: 14.0,
+              right: 14.0,
+              bottom: 20.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Gap(20.0),
+                CustomTextField(
+                  controller: nameController,
+                  title: "Streak name",
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.cardColorTheme(isDark),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                        child: BlocBuilder<IconBloc, IconState>(
-                          builder: (context, state) {
-                            return GestureDetector(
-                              onTap: () => _showIconPicker(context),
-                              child: Container(
-                                padding: const EdgeInsets.all(12.0),
-                                decoration: BoxDecoration(
-                                  color: AppColors.cardColor,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                child: Icon(state.selectedIcon,
-                                    color: AppColors.whiteColor),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            InkWell(
-                              onTap: () => _showIconPicker(context),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 12.0,
-                                  right: 12.0,
-                                  bottom: 12.0,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Icon",
-                                      style: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.whiteColor,
-                                        fontSize: 18.0,
-                                      ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 14.0),
+                            child: BlocBuilder<IconBloc, IconState>(
+                              builder: (context, state) {
+                                return GestureDetector(
+                                  onTap: () => _showIconPicker(context),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12.0),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.cardColorTheme(isDark),
+                                      borderRadius: BorderRadius.circular(10.0),
                                     ),
-                                    Icon(
-                                      LucideIcons.chevronRight,
-                                      color: AppColors.greyColor,
-                                    ),
-                                  ],
-                                ),
-                              ),
+                                    child: Icon(state.selectedIcon,
+                                        color: AppColors.textColor(isDark)),
+                                  ),
+                                );
+                              },
                             ),
-                            InkWell(
-                              onTap: () => _showColorPicker(context),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 12.0,
-                                  right: 12.0,
-                                  bottom: 12.0,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Color",
-                                      style: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.whiteColor,
-                                        fontSize: 18.0,
-                                      ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                InkWell(
+                                  onTap: () => _showIconPicker(context),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 12.0,
+                                      right: 12.0,
+                                      bottom: 12.0,
                                     ),
-                                    const Gap(10.0),
-                                    Row(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Container(
-                                          height: 30.0,
-                                          width: 30.0,
-                                          decoration: BoxDecoration(
-                                            color: Color(selectedColorCode),
-                                            shape: BoxShape.circle,
+                                        Text(
+                                          "Icon",
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textColor(isDark),
+                                            fontSize: 18.0,
                                           ),
                                         ),
-                                        const Gap(10.0),
                                         Icon(
                                           LucideIcons.chevronRight,
-                                          color: AppColors.greyColor,
+                                          color:
+                                              AppColors.greyColorTheme(isDark),
                                         ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                InkWell(
+                                  onTap: () => _showColorPicker(context),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 12.0,
+                                      right: 12.0,
+                                      bottom: 12.0,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Color",
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textColor(isDark),
+                                            fontSize: 18.0,
+                                          ),
+                                        ),
+                                        const Gap(10.0),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              height: 30.0,
+                                              width: 30.0,
+                                              decoration: BoxDecoration(
+                                                color: Color(selectedColorCode),
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            const Gap(10.0),
+                                            Icon(
+                                              LucideIcons.chevronRight,
+                                              color: AppColors.greyColorTheme(
+                                                  isDark),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            const Gap(20.0),
-            CustomTextField(
-              controller: timeController,
-              isReadOnly: true,
-              title: "Notification Time",
-              onPressed: () async {
-                TimeOfDay? pickedTime = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.now(),
-                );
-                setState(() {
-                  selectedTime = pickedTime;
-                  timeController.text = selectedTime?.format(context) ?? "";
-                });
-              },
-            ),
-            CustomDropDownField(
-              title: "Week start from",
-              items: const [
-                "Sunday",
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday"
-              ],
-              onChanged: (value) {
-                activeDays.clear();
-                setState(() {
-                  selectedWeekDay = value;
-                  selectedDaysPerWeek = "7";
-                  activeDaysController.text = "7";
-                  selectedWeekIndex = AppConstants.selectedWeekIndex(value);
-                });
-              },
-              value: selectedWeekDay,
-            ),
-            CustomDropDownField(
-              value: selectedDaysPerWeek,
-              controller: activeDaysController,
-              title: "How many days per week should you complete this habit?",
-              items: const ["1", "2", "3", "4", "5", "6", "7"],
-              onChanged: (value) {
-                activeDays.clear();
-                for (int i = 0; i < int.parse(value); i++) {
-                  int currentIndex = (selectedWeekIndex + i) % 7;
-                  activeDays.add(currentIndex);
-                }
-                setState(() {
-                  selectedDaysPerWeek = value;
-                  activeDaysController.text = value;
-                });
-              },
-            ),
-            if (selectedDaysPerWeek != "7")
-              SelectStreakActiveDays(
-                activeDays: activeDays,
-                selectedWeekDayIndex: selectedWeekIndex,
-                onDaysSelected: (days) {
-                  int selectedDayLength = int.parse(selectedDaysPerWeek);
-                  setState(() {
-                    if (!activeDays
-                            .contains(AppConstants.selectedDayIndex(days)) &&
-                        (activeDays.length == selectedDayLength)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: AppColors.primaryColor,
-                          content: Text(
-                            "You can only select $selectedDayLength days",
+                ),
+                const Gap(20.0),
+                CustomTextField(
+                  controller: timeController,
+                  isReadOnly: true,
+                  title: "Notification Time",
+                  onPressed: () async {
+                    TimeOfDay? pickedTime = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+                    setState(() {
+                      selectedTime = pickedTime;
+                      timeController.text = selectedTime?.format(context) ?? "";
+                    });
+                  },
+                ),
+                CustomDropDownField(
+                  title: "Week start from",
+                  items: const [
+                    "Sunday",
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday"
+                  ],
+                  onChanged: (value) {
+                    activeDays.clear();
+                    setState(() {
+                      selectedWeekDay = value;
+                      selectedDaysPerWeek = "7";
+                      activeDaysController.text = "7";
+                      selectedWeekIndex = AppConstants.selectedWeekIndex(value);
+                    });
+                  },
+                  value: selectedWeekDay,
+                ),
+                CustomDropDownField(
+                  value: selectedDaysPerWeek,
+                  controller: activeDaysController,
+                  title:
+                      "How many days per week should you complete this habit?",
+                  items: const ["1", "2", "3", "4", "5", "6", "7"],
+                  onChanged: (value) {
+                    activeDays.clear();
+                    for (int i = 0; i < int.parse(value); i++) {
+                      int currentIndex = (selectedWeekIndex + i) % 7;
+                      activeDays.add(currentIndex);
+                    }
+                    setState(() {
+                      selectedDaysPerWeek = value;
+                      activeDaysController.text = value;
+                    });
+                  },
+                ),
+                if (selectedDaysPerWeek != "7")
+                  BlocBuilder<ThemeBloc, ThemeState>(
+                    builder: (context, themeState) {
+                      final daysIsDark =
+                          themeState is ThemeLoaded ? themeState.isDark : true;
+                      return SelectStreakActiveDays(
+                        activeDays: activeDays,
+                        selectedWeekDayIndex: selectedWeekIndex,
+                        isDark: daysIsDark,
+                        onDaysSelected: (days) {
+                          int selectedDayLength =
+                              int.parse(selectedDaysPerWeek);
+                          setState(() {
+                            if (!activeDays.contains(
+                                    AppConstants.selectedDayIndex(days)) &&
+                                (activeDays.length == selectedDayLength)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: AppColors.primaryColor,
+                                  content: Text(
+                                    "You can only select $selectedDayLength days",
+                                    style: GoogleFonts.poppins(
+                                      color: AppColors.whiteColor,
+                                    ),
+                                  ),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            } else {
+                              setState(() {
+                                if (activeDays.contains(
+                                    AppConstants.selectedDayIndex(days))) {
+                                  activeDays.remove(
+                                      AppConstants.selectedDayIndex(days));
+                                } else {
+                                  activeDays
+                                      .add(AppConstants.selectedDayIndex(days));
+                                }
+                              });
+                            }
+                          });
+                        },
+                      );
+                    },
+                  ),
+                const Gap(30.0),
+                BlocBuilder<PurchasesBloc, PurchasesState>(
+                  builder: (context, state) {
+                    return GestureDetector(
+                      onTap: () {
+                        if (state.totalStreaksLength >= 3 &&
+                            !state.isSubscriptionActive) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PurchasesScreen()),
+                          );
+                        } else {
+                          _saveStreak();
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 45.0,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Save",
                             style: GoogleFonts.poppins(
-                              color: AppColors.whiteColor,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 18.0,
                             ),
                           ),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    } else {
-                      setState(() {
-                        if (activeDays
-                            .contains(AppConstants.selectedDayIndex(days))) {
-                          activeDays
-                              .remove(AppConstants.selectedDayIndex(days));
-                        } else {
-                          activeDays.add(AppConstants.selectedDayIndex(days));
-                        }
-                      });
-                    }
-                  });
-                },
-              ),
-            const Gap(30.0),
-            BlocBuilder<PurchasesBloc, PurchasesState>(
-              builder: (context, state) {
-                return GestureDetector(
-                  onTap: () {
-                    if (state.totalStreaksLength > 3 &&
-                        !state.isSubscriptionActive) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PurchasesScreen()),
-                      );
-                    } else {
-                      _saveStreak();
-                    }
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 45.0,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Save",
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 18.0,
                         ),
                       ),
-                    ),
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+                const Gap(20.0),
+              ],
             ),
-            const Gap(20.0),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   _errorDialog(String message) {
+    final isDark = context.read<ThemeBloc>().state is ThemeLoaded
+        ? (context.read<ThemeBloc>().state as ThemeLoaded).isDark
+        : true;
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Error"),
-          content: Text(message),
+          backgroundColor: AppColors.cardColorTheme(isDark),
+          title: Text(
+            "Error",
+            style: GoogleFonts.poppins(color: AppColors.textColor(isDark)),
+          ),
+          content: Text(
+            message,
+            style: GoogleFonts.poppins(color: AppColors.textColor(isDark)),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text("OK"),
+              child: Text(
+                "OK",
+                style: GoogleFonts.poppins(color: AppColors.primaryColor),
+              ),
             ),
           ],
         );
@@ -465,6 +499,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   }
 
   void _showIconPicker(BuildContext ctx) {
+    final isDark = context.read<ThemeBloc>().state is ThemeLoaded
+        ? (context.read<ThemeBloc>().state as ThemeLoaded).isDark
+        : true;
     final List<String> categories = [
       "All",
       "Habit",
@@ -473,12 +510,12 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
       "Sports",
     ];
     showModalBottomSheet(
-      backgroundColor: AppColors.secondaryColor,
+      backgroundColor: AppColors.secondaryColorTheme(isDark),
       showDragHandle: true,
       context: context,
       builder: (context) {
         return BottomSheet(
-          backgroundColor: AppColors.secondaryColor,
+          backgroundColor: AppColors.secondaryColorTheme(isDark),
           onClosing: () {},
           builder: (context) {
             return DefaultTabController(
@@ -512,8 +549,8 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                                       style: GoogleFonts.poppins(
                                         fontWeight: FontWeight.w700,
                                         color: state.currentIndex == index
-                                            ? AppColors.whiteColor
-                                            : FlexColor.greyDarkSecondary,
+                                            ? AppColors.textColor(isDark)
+                                            : AppColors.greyColorTheme(isDark),
                                         fontSize: 18.0,
                                       ),
                                     ),
@@ -562,14 +599,17 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
     );
   }
 
-  void _showColorPicker(context) {
+  void _showColorPicker(BuildContext ctx) {
+    final isDark = context.read<ThemeBloc>().state is ThemeLoaded
+        ? (context.read<ThemeBloc>().state as ThemeLoaded).isDark
+        : true;
     showModalBottomSheet(
-      backgroundColor: AppColors.secondaryColor,
+      backgroundColor: AppColors.secondaryColorTheme(isDark),
       showDragHandle: true,
-      context: context,
+      context: ctx,
       builder: (context) {
         return BottomSheet(
-          backgroundColor: AppColors.secondaryColor,
+          backgroundColor: AppColors.secondaryColorTheme(isDark),
           onClosing: () {},
           builder: (context) {
             return StreaksColors(
@@ -589,6 +629,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   }
 
   Widget _buildIconGrid(BuildContext context, List<IconData> icons) {
+    final isDark = context.read<ThemeBloc>().state is ThemeLoaded
+        ? (context.read<ThemeBloc>().state as ThemeLoaded).isDark
+        : true;
     return SizedBox(
       height: 300.0,
       child: GridView.builder(
@@ -608,10 +651,10 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.cardColor,
+                color: AppColors.cardColorTheme(isDark),
                 borderRadius: BorderRadius.circular(10.0),
               ),
-              child: Icon(icon, color: AppColors.whiteColor),
+              child: Icon(icon, color: AppColors.textColor(isDark)),
             ),
           );
         },
@@ -840,11 +883,13 @@ class SelectStreakActiveDays extends StatefulWidget {
   final Function(String days) onDaysSelected;
   final int selectedWeekDayIndex;
   final List<int>? activeDays;
+  final bool isDark;
   const SelectStreakActiveDays({
     super.key,
     required this.onDaysSelected,
     this.selectedWeekDayIndex = 0,
     this.activeDays,
+    this.isDark = true,
   });
 
   @override
@@ -860,7 +905,7 @@ class _SelectStreakActiveDaysState extends State<SelectStreakActiveDays> {
         Text(
           "Select Active Days",
           style: GoogleFonts.poppins(
-            color: Color(0xFFBFCFE7),
+            color: AppColors.greyColorTheme(widget.isDark),
             fontSize: 16.0,
           ),
         ),
@@ -887,14 +932,14 @@ class _SelectStreakActiveDaysState extends State<SelectStreakActiveDays> {
                             ) ??
                             false)
                         ? AppColors.primaryColor
-                        : AppColors.blackColor,
+                        : AppColors.backgroundColor(widget.isDark),
                     borderRadius: BorderRadius.circular(5.0),
                     border: !(widget.activeDays?.contains(
                               AppConstants.selectedDayIndex(days),
                             ) ??
                             false)
                         ? Border.all(
-                            color: FlexColor.greyDarkSecondary,
+                            color: AppColors.greyColorTheme(widget.isDark),
                           )
                         : null,
                   ),
@@ -906,8 +951,8 @@ class _SelectStreakActiveDaysState extends State<SelectStreakActiveDays> {
                                   AppConstants.selectedDayIndex(days),
                                 ) ??
                                 false)
-                            ? AppColors.whiteColor
-                            : AppColors.blackColor,
+                            ? AppColors.textColor(widget.isDark)
+                            : AppColors.darkBackgroundColor,
                       ),
                     ),
                   ),

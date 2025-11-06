@@ -45,3 +45,13 @@ class AddStreakDate extends StreaksEvent {
   @override
   List<Object> get props => [id, date];
 }
+
+class RemoveStreakDate extends StreaksEvent {
+  final Id id;
+  final DateTime date;
+
+  const RemoveStreakDate(this.id, this.date);
+
+  @override
+  List<Object> get props => [id, date];
+}

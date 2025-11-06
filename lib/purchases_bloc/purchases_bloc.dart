@@ -55,7 +55,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       if (current != null) {
         emit(state.copyWith(offerings: [current], isLoading: false));
         emit(state.copyWith(
-          selectedPackage: current.monthly,
+          selectedPackage: current.weekly,
           selectedIndex: 0,
         ));
       }
