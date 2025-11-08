@@ -52,6 +52,9 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       emit(state.copyWith(isLoading: true));
       final offerings = await Purchases.getOfferings();
       final current = offerings.current;
+      Package? sale = current?.getPackage("11_nov_sale");
+      debugPrint(sale.toString());
+      debugPrint(current?.annual?.identifier.toString());
       if (current != null) {
         emit(state.copyWith(offerings: [current], isLoading: false));
         emit(state.copyWith(

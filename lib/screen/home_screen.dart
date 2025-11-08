@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:streaks/bloc/streaks_bloc.dart';
+import 'package:streaks/components/sale_offer_banner.dart';
 import 'package:streaks/components/streak_container.dart';
 import 'package:streaks/database/streaks_database.dart';
 import 'package:streaks/purchases_bloc/purchases_bloc.dart';
@@ -13,6 +16,7 @@ import 'package:streaks/bloc/theme_bloc.dart';
 import 'package:streaks/screen/add_screen.dart';
 import 'package:streaks/screen/premium_user.dart';
 import 'package:streaks/screen/purchases_screen.dart';
+import 'package:streaks/screen/sale_offer_screen.dart';
 import 'package:streaks/screen/streak_details/streak_detail_screen.dart';
 import 'package:streaks/screen/updates_screen.dart';
 import 'package:streaks/screen/settings_screen.dart';
@@ -25,11 +29,39 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  bool _firstHabitDialogScheduled = false;
+  late final AnimationController _pulseController;
+  late final Animation<double> _pulseAnimation;
+  static const Duration _saleOfferDuration = Duration(hours: 2);
+  Timer? _offerTimer;
+  Duration _offerRemaining = Duration.zero;
+  DateTime? _offerExpiry;
+  bool _showOfferBanner = false;
+
   @override
   void initState() {
     _checkAndShowWhatsNew();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 0.96, end: 1.04).animate(
+      CurvedAnimation(
+        parent: _pulseController,
+        curve: Curves.easeInOut,
+      ),
+    );
+    _loadSaleOfferBanner();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    _offerTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _checkAndShowWhatsNew() async {
@@ -109,17 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               IconButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .push(
-                    MaterialPageRoute(
-                      builder: (context) => const AddStrekScreen(),
-                    ),
-                  )
-                      .then((_) {
-                    context.read<StreaksBloc>().add(LoadStreaks());
-                  });
-                },
+                onPressed: _openAddHabit,
                 icon: Icon(
                   LucideIcons.plusSquare,
                   color: AppColors.darkBackgroundColor,
@@ -131,37 +153,64 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: false,
             child: BlocBuilder<StreaksBloc, StreaksState>(
               builder: (context, state) {
+                Widget content;
+
                 if (state is StreaksLoading) {
-                  return Center(
+                  content = Center(
                     child: CircularProgressIndicator(
                       color: AppColors.primaryColor,
                     ),
                   );
                 } else if (state is StreaksError) {
-                  return Center(child: Text('Error: ${state.message}'));
+                  content = Center(child: Text('Error: ${state.message}'));
                 } else if (state is StreaksUpdated) {
                   if (state.streaks.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            AppAssets.noHabits,
-                            height: 300.0,
+                    _scheduleFirstHabitDialogIfNeeded(isDark);
+                    content = Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 420),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                AppAssets.noHabits,
+                                height: 260.0,
+                              ),
+                              const SizedBox(height: 32),
+                              Text(
+                                "Your streak canvas is ready",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                  color: AppColors.textColor(isDark),
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 28.0,
+                                  height: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                "Start with one habit. Give it a name, set the cadence, and watch your dashboard light up with momentum.",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                  color: AppColors.greyColorTheme(isDark),
+                                  fontSize: 15.0,
+                                  height: 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 28),
+                              _buildAnimatedAddHabitButton(isDark),
+                            ],
                           ),
-                          Text(
-                            'No streaks found',
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textColor(isDark),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 32.0,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     );
                   } else {
-                    return ListView.builder(
+                    if (SharePrefsService.shouldShowFirstHabitDialog()) {
+                      SharePrefsService.markFirstHabitDialogShown();
+                    }
+                    content = ListView.builder(
                       padding: const EdgeInsets.fromLTRB(8.0, 20.0, 8.0, 20.0),
                       controller:
                           PageController(viewportFraction: 0.8, keepPage: true),
@@ -173,7 +222,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             streak: streak,
                           ),
                           onTap: () {
-                            // Use pushReplacement or ensure smooth navigation
                             Navigator.of(context).push(
                               PageRouteBuilder(
                                 pageBuilder:
@@ -196,13 +244,361 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   }
                 } else {
-                  return const Center(child: Text('Unknown state'));
+                  content = const Center(child: Text('Unknown state'));
                 }
+
+                return Column(
+                  children: [
+                    if (_showOfferBanner && _offerRemaining > Duration.zero)
+                      SaleOfferBanner(
+                        remaining: _offerRemaining,
+                        onDismiss: _handleOfferDismissed,
+                        onTap: _handleOfferBannerTapped,
+                      ),
+                    Expanded(child: content),
+                  ],
+                );
               },
             ),
           ),
         );
       },
+    );
+  }
+
+  Future<void> _loadSaleOfferBanner() async {
+    final expiry =
+        await SharePrefsService.ensureSaleOfferExpiry(_saleOfferDuration);
+
+    if (!mounted) return;
+
+    final remaining = expiry.difference(DateTime.now());
+
+    if (remaining <= Duration.zero) {
+      _offerTimer?.cancel();
+      _offerTimer = null;
+      _offerExpiry = null;
+      setState(() {
+        _offerRemaining = Duration.zero;
+        _showOfferBanner = false;
+      });
+      return;
+    }
+
+    _offerExpiry = expiry;
+    _offerRemaining = remaining;
+    _showOfferBanner = !SharePrefsService.isSaleOfferBannerDismissed();
+    setState(() {});
+    _startOfferTimer();
+  }
+
+  void _startOfferTimer() {
+    _offerTimer?.cancel();
+
+    if (_offerExpiry == null) {
+      return;
+    }
+
+    _offerTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted || _offerExpiry == null) {
+        timer.cancel();
+        return;
+      }
+
+      final remaining = _offerExpiry!.difference(DateTime.now());
+
+      if (remaining <= Duration.zero) {
+        timer.cancel();
+        _offerExpiry = null;
+        unawaited(SharePrefsService.setSaleOfferBannerDismissed(true));
+        unawaited(SharePrefsService.clearSaleOfferExpiry());
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _offerRemaining = Duration.zero;
+          _showOfferBanner = false;
+        });
+      } else {
+        final isDismissed = SharePrefsService.isSaleOfferBannerDismissed();
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _offerRemaining = remaining;
+          _showOfferBanner = !isDismissed;
+        });
+      }
+    });
+  }
+
+  void _handleOfferDismissed() {
+    unawaited(SharePrefsService.setSaleOfferBannerDismissed(true));
+    setState(() {
+      _showOfferBanner = false;
+    });
+  }
+
+  Future<void> _handleOfferBannerTapped() async {
+    final shouldOpenCheckout = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => const SaleOfferScreen(),
+      ),
+    );
+
+    if (!mounted) return;
+
+    await _loadSaleOfferBanner();
+
+    if (shouldOpenCheckout == true && mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const PurchasesScreen(),
+        ),
+      );
+    }
+  }
+
+  void _scheduleFirstHabitDialogIfNeeded(bool isDark) {
+    if (!_firstHabitDialogScheduled &&
+        SharePrefsService.shouldShowFirstHabitDialog()) {
+      _firstHabitDialogScheduled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (ModalRoute.of(context)?.isCurrent != true) {
+          _firstHabitDialogScheduled = false;
+          return;
+        }
+        _showFirstHabitDialog(isDark);
+      });
+    }
+  }
+
+  Future<void> _showFirstHabitDialog(bool isDark) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: AppColors.cardColorTheme(isDark),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 64,
+                  width: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    LucideIcons.compass,
+                    size: 32,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  "Let’s build your first streak",
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textColor(isDark),
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "A habit only becomes legendary when it’s captured. Take sixty seconds right now to set up the ritual you’ll protect for the next 66 days.",
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    height: 1.5,
+                    color: AppColors.greyColorTheme(isDark),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Column(
+                  children: [
+                    _buildDialogStep(
+                      number: "1",
+                      text:
+                          "Name the identity you’re stepping into—make it vivid and personal.",
+                      isDark: isDark,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDialogStep(
+                      number: "2",
+                      text:
+                          "Choose when it happens so notifications nudge you at the perfect moment.",
+                      isDark: isDark,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDialogStep(
+                      number: "3",
+                      text:
+                          "Tap save and instantly see your streak dashboard come alive.",
+                      isDark: isDark,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
+                ElevatedButton(
+                  onPressed: () {
+                    SharePrefsService.markFirstHabitDialogShown();
+                    Navigator.of(dialogContext).pop();
+                    _openAddHabit();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    foregroundColor: AppColors.darkBackgroundColor,
+                    minimumSize: const Size.fromHeight(52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    textStyle: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  child: const Text("Create my first habit"),
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      SharePrefsService.markFirstHabitDialogShown();
+                      Navigator.of(dialogContext).pop();
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.greyColorTheme(isDark),
+                      textStyle: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    child: const Text("I’ll explore a bit first"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAnimatedAddHabitButton(bool isDark) {
+    return ScaleTransition(
+      scale: _pulseAnimation,
+      child: InkWell(
+        onTap: () {
+          SharePrefsService.markFirstHabitDialogShown();
+          _openAddHabit();
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primaryColor,
+                AppColors.primaryColor.withValues(alpha: 0.85),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryColor.withValues(alpha: 0.55),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.plus,
+                color: AppColors.darkBackgroundColor,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                "Design my first habit",
+                style: GoogleFonts.poppins(
+                  color: AppColors.darkBackgroundColor,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openAddHabit() {
+    SharePrefsService.markFirstHabitDialogShown();
+    _firstHabitDialogScheduled = false;
+    Navigator.of(context)
+        .push(
+      MaterialPageRoute(
+        builder: (context) => const AddStrekScreen(),
+      ),
+    )
+        .then((_) {
+      context.read<StreaksBloc>().add(LoadStreaks());
+    });
+  }
+
+  Widget _buildDialogStep({
+    required String number,
+    required String text,
+    required bool isDark,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor(isDark),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            number,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              height: 1.5,
+              color: AppColors.textColor(isDark),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

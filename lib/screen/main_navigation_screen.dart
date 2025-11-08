@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:streaks/bloc/streaks_bloc.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/bloc/theme_bloc.dart';
 import 'package:streaks/screen/home_screen.dart';
 import 'package:streaks/screen/report_screen.dart';
 import 'package:streaks/screen/leaderboard_screen.dart';
 import 'package:streaks/screen/profile_screen.dart';
+import 'package:streaks/screen/purchases_screen.dart';
+import 'package:streaks/services/share_prefs_services.dart';
 
 class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+  final bool showSubscriptionOnLaunch;
+
+  const MainNavigationScreen({
+    super.key,
+    this.showSubscriptionOnLaunch = false,
+  });
 
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
@@ -28,6 +36,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const LeaderboardScreen(),
     ProfileScreen(key: _profileScreenKey),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.showSubscriptionOnLaunch) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const PurchasesScreen(),
+          ),
+        );
+        if (!mounted) return;
+        SharePrefsService.setFirstHabitDialogPending();
+        context.read<StreaksBloc>().add(LoadStreaks());
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

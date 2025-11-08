@@ -6,6 +6,7 @@ class AppAssets {
   static const String onboarding3 = 'assets/ob3.JPG';
   static const String onboarding4 = 'assets/ob4.JPG';
   static const String onboarding5 = 'assets/ob5.JPG';
+  static const String saleOffer = 'assets/giftbox.png';
 
   // Badges Assets
   static const String strekLevelBadge1 = "assets/badges/rank-badge.png";

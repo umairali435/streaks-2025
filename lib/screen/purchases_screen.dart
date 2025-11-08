@@ -9,6 +9,7 @@ import 'package:streaks/purchases_bloc/purchases_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_event.dart';
 import 'package:streaks/purchases_bloc/purchases_state.dart';
 import 'package:streaks/res/colors.dart';
+import 'package:streaks/screen/sale_offer_screen.dart';
 import 'package:streaks/screen/streak_details/widgets/custom_loading_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,7 +31,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
 
   @override
   void initState() {
-    context.read<PurchasesBloc>().add(InitPurchases());
+    context.read<PurchasesBloc>().add(FetchOffers());
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1200),
@@ -106,7 +107,8 @@ class _PurchasesScreenState extends State<PurchasesScreen>
                               alignment: Alignment.center,
                               children: [
                                 _buildPurchaseContent(state, isDark),
-                                if (state.isLoading) _buildLoadingOverlay(isDark),
+                                if (state.isLoading)
+                                  _buildLoadingOverlay(isDark),
                               ],
                             ),
                           ),
@@ -128,11 +130,16 @@ class _PurchasesScreenState extends State<PurchasesScreen>
         child: Row(
           children: [
             GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
+              onTap: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => SaleOfferScreen()),
+                );
+              },
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.backgroundColor(isDark).withValues(alpha: 0.3),
+                  color:
+                      AppColors.backgroundColor(isDark).withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: AppColors.primaryColor.withValues(alpha: 0.3),
@@ -249,7 +256,7 @@ class _PurchasesScreenState extends State<PurchasesScreen>
                 const Gap(50),
                 Packages(isDark: isDark),
                 const Gap(30),
-                                _buildPurchaseButton(state),
+                _buildPurchaseButton(state),
                 const Gap(20),
                 _buildRestoreButton(isDark),
                 const Gap(20),
@@ -388,14 +395,17 @@ class _PurchasesScreenState extends State<PurchasesScreen>
         children: [
           Icon(
             LucideIcons.rotateCw,
-            color: isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
+            color:
+                isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
             size: 20,
           ),
           const Gap(8),
           Text(
             "Restore Purchases",
             style: GoogleFonts.poppins(
-              color: isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
+              color: isDark
+                  ? AppColors.primaryColor
+                  : AppColors.darkBackgroundColor,
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -622,13 +632,18 @@ class PackagesWidgets extends StatelessWidget {
                     ],
                   )
                 : null,
-            color:
-                selectedPackage ? null : (isDark ? AppColors.cardColorTheme(isDark).withValues(alpha: 0.05) : AppColors.cardColorTheme(isDark)),
+            color: selectedPackage
+                ? null
+                : (isDark
+                    ? AppColors.cardColorTheme(isDark).withValues(alpha: 0.05)
+                    : AppColors.cardColorTheme(isDark)),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: selectedPackage
                   ? AppColors.primaryColor
-                  : (isDark ? AppColors.greyColorTheme(isDark).withValues(alpha: 0.3) : AppColors.greyColorTheme(isDark)),
+                  : (isDark
+                      ? AppColors.greyColorTheme(isDark).withValues(alpha: 0.3)
+                      : AppColors.greyColorTheme(isDark)),
               width: selectedPackage ? 2 : (isDark ? 1 : 1.5),
             ),
             boxShadow: selectedPackage
@@ -658,7 +673,8 @@ class PackagesWidgets extends StatelessWidget {
                                 ]
                               : [
                                   AppColors.secondaryColorTheme(isDark),
-                                  AppColors.secondaryColorTheme(isDark).withValues(alpha: 0.8),
+                                  AppColors.secondaryColorTheme(isDark)
+                                      .withValues(alpha: 0.8),
                                 ],
                         ),
                         borderRadius: const BorderRadius.only(
@@ -671,16 +687,18 @@ class PackagesWidgets extends StatelessWidget {
                         children: [
                           Icon(
                             LucideIcons.gift,
-                            color:
-                                selectedPackage ? AppColors.darkBackgroundColor : AppColors.textColor(isDark),
+                            color: selectedPackage
+                                ? AppColors.darkBackgroundColor
+                                : AppColors.textColor(isDark),
                             size: 16,
                           ),
                           const Gap(5),
                           Text(
                             "Try for free",
                             style: GoogleFonts.poppins(
-                              color:
-                                  selectedPackage ? AppColors.darkBackgroundColor : AppColors.textColor(isDark),
+                              color: selectedPackage
+                                  ? AppColors.darkBackgroundColor
+                                  : AppColors.textColor(isDark),
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
@@ -857,7 +875,8 @@ class _BillingInfoWidgetState extends State<BillingInfoWidget> {
     );
   }
 
-  Widget _buildLegalButton(String text, IconData icon, VoidCallback onPressed, bool isDark) {
+  Widget _buildLegalButton(
+      String text, IconData icon, VoidCallback onPressed, bool isDark) {
     return TextButton.icon(
       onPressed: onPressed,
       icon: Icon(
@@ -868,7 +887,8 @@ class _BillingInfoWidgetState extends State<BillingInfoWidget> {
       label: Text(
         text,
         style: GoogleFonts.poppins(
-          color: isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
+          color:
+              isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),

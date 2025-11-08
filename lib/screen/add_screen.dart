@@ -395,6 +395,7 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                             "Save",
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w900,
+                              color: AppColors.blackColor,
                               fontSize: 18.0,
                             ),
                           ),
