@@ -10,7 +10,6 @@ import 'package:streaks/components/streak_container.dart';
 import 'package:streaks/database/streaks_database.dart';
 import 'package:streaks/purchases_bloc/purchases_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_state.dart';
-import 'package:streaks/res/assets.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/bloc/theme_bloc.dart';
 import 'package:streaks/screen/add_screen.dart';
@@ -18,7 +17,6 @@ import 'package:streaks/screen/premium_user.dart';
 import 'package:streaks/screen/purchases_screen.dart';
 import 'package:streaks/screen/sale_offer_screen.dart';
 import 'package:streaks/screen/streak_details/streak_detail_screen.dart';
-import 'package:streaks/screen/updates_screen.dart';
 import 'package:streaks/screen/settings_screen.dart';
 import 'package:streaks/services/share_prefs_services.dart';
 
@@ -34,19 +32,20 @@ class _HomeScreenState extends State<HomeScreen>
   bool _firstHabitDialogScheduled = false;
   late final AnimationController _pulseController;
   late final Animation<double> _pulseAnimation;
-  static const Duration _saleOfferDuration = Duration(hours: 2);
+  static const Duration _saleOfferDuration = Duration(days: 4, hours: 4);
   Timer? _offerTimer;
   Duration _offerRemaining = Duration.zero;
   DateTime? _offerExpiry;
   bool _showOfferBanner = false;
+  int _lastRemainingSeconds = -1;
+  bool _lastOfferVisibility = false;
 
   @override
   void initState() {
-    _checkAndShowWhatsNew();
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1800),
-    )..repeat(reverse: true);
+    );
     _pulseAnimation = Tween<double>(begin: 0.96, end: 1.04).animate(
       CurvedAnimation(
         parent: _pulseController,
@@ -62,26 +61,6 @@ class _HomeScreenState extends State<HomeScreen>
     _pulseController.dispose();
     _offerTimer?.cancel();
     super.dispose();
-  }
-
-  Future<void> _checkAndShowWhatsNew() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    bool shouldShow = await SharePrefsService.shouldShowWhatsNew();
-
-    if (shouldShow && mounted) {
-      _navigateToWhatsNew();
-    }
-  }
-
-  void _navigateToWhatsNew() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const WhatsNewScreen(
-          showMarkAsSeenButton: true,
-        ),
-      ),
-    );
   }
 
   @override
@@ -156,57 +135,45 @@ class _HomeScreenState extends State<HomeScreen>
                 Widget content;
 
                 if (state is StreaksLoading) {
+                  if (_pulseController.isAnimating) {
+                    _pulseController.stop();
+                    _pulseController.reset();
+                  }
                   content = Center(
                     child: CircularProgressIndicator(
                       color: AppColors.primaryColor,
                     ),
                   );
                 } else if (state is StreaksError) {
+                  if (_pulseController.isAnimating) {
+                    _pulseController.stop();
+                    _pulseController.reset();
+                  }
                   content = Center(child: Text('Error: ${state.message}'));
                 } else if (state is StreaksUpdated) {
                   if (state.streaks.isEmpty) {
+                    if (!_pulseController.isAnimating) {
+                      _pulseController.repeat(reverse: true);
+                    }
                     _scheduleFirstHabitDialogIfNeeded(isDark);
                     content = Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 420),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                AppAssets.noHabits,
-                                height: 260.0,
-                              ),
-                              const SizedBox(height: 32),
-                              Text(
-                                "Your streak canvas is ready",
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.textColor(isDark),
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 28.0,
-                                  height: 1.2,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                "Start with one habit. Give it a name, set the cadence, and watch your dashboard light up with momentum.",
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.greyColorTheme(isDark),
-                                  fontSize: 15.0,
-                                  height: 1.5,
-                                ),
-                              ),
-                              const SizedBox(height: 28),
-                              _buildAnimatedAddHabitButton(isDark),
-                            ],
-                          ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 420),
+                        child: ListView(
+                          padding: EdgeInsets.symmetric(horizontal: 22.0),
+                          children: [
+                            _buildEmptyStateCard(isDark),
+                            const SizedBox(height: 28),
+                            _buildAnimatedAddHabitButton(isDark),
+                          ],
                         ),
                       ),
                     );
                   } else {
+                    if (_pulseController.isAnimating) {
+                      _pulseController.stop();
+                      _pulseController.reset();
+                    }
                     if (SharePrefsService.shouldShowFirstHabitDialog()) {
                       SharePrefsService.markFirstHabitDialogShown();
                     }
@@ -249,12 +216,22 @@ class _HomeScreenState extends State<HomeScreen>
 
                 return Column(
                   children: [
-                    if (_showOfferBanner && _offerRemaining > Duration.zero)
-                      SaleOfferBanner(
-                        remaining: _offerRemaining,
-                        onDismiss: _handleOfferDismissed,
-                        onTap: _handleOfferBannerTapped,
-                      ),
+                    BlocBuilder<PurchasesBloc, PurchasesState>(
+                      builder: (context, purchaseState) {
+                        final showBanner =
+                            !purchaseState.isSubscriptionActive &&
+                                _showOfferBanner &&
+                                _offerRemaining > Duration.zero;
+                        if (!showBanner) {
+                          return const SizedBox.shrink();
+                        }
+                        return SaleOfferBanner(
+                          remaining: _offerRemaining,
+                          onDismiss: _handleOfferDismissed,
+                          onTap: _handleOfferBannerTapped,
+                        );
+                      },
+                    ),
                     Expanded(child: content),
                   ],
                 );
@@ -267,6 +244,21 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _loadSaleOfferBanner() async {
+    final isPremium = context.read<PurchasesBloc>().state.isSubscriptionActive;
+    if (isPremium) {
+      await SharePrefsService.setSaleOfferBannerDismissed(true);
+      _offerTimer?.cancel();
+      _offerTimer = null;
+      _offerExpiry = null;
+      _lastRemainingSeconds = -1;
+      _lastOfferVisibility = false;
+      setState(() {
+        _offerRemaining = Duration.zero;
+        _showOfferBanner = false;
+      });
+      return;
+    }
+
     final expiry =
         await SharePrefsService.ensureSaleOfferExpiry(_saleOfferDuration);
 
@@ -278,6 +270,8 @@ class _HomeScreenState extends State<HomeScreen>
       _offerTimer?.cancel();
       _offerTimer = null;
       _offerExpiry = null;
+      _lastRemainingSeconds = -1;
+      _lastOfferVisibility = false;
       setState(() {
         _offerRemaining = Duration.zero;
         _showOfferBanner = false;
@@ -288,6 +282,8 @@ class _HomeScreenState extends State<HomeScreen>
     _offerExpiry = expiry;
     _offerRemaining = remaining;
     _showOfferBanner = !SharePrefsService.isSaleOfferBannerDismissed();
+    _lastRemainingSeconds = remaining.inSeconds;
+    _lastOfferVisibility = _showOfferBanner;
     setState(() {});
     _startOfferTimer();
   }
@@ -305,7 +301,22 @@ class _HomeScreenState extends State<HomeScreen>
         return;
       }
 
+      if (context.read<PurchasesBloc>().state.isSubscriptionActive) {
+        unawaited(SharePrefsService.setSaleOfferBannerDismissed(true));
+        timer.cancel();
+        _offerExpiry = null;
+        _lastRemainingSeconds = -1;
+        _lastOfferVisibility = false;
+        if (!mounted) return;
+        setState(() {
+          _offerRemaining = Duration.zero;
+          _showOfferBanner = false;
+        });
+        return;
+      }
+
       final remaining = _offerExpiry!.difference(DateTime.now());
+      final remainingSeconds = remaining.inSeconds;
 
       if (remaining <= Duration.zero) {
         timer.cancel();
@@ -319,15 +330,23 @@ class _HomeScreenState extends State<HomeScreen>
           _offerRemaining = Duration.zero;
           _showOfferBanner = false;
         });
+        _lastRemainingSeconds = -1;
+        _lastOfferVisibility = false;
       } else {
         final isDismissed = SharePrefsService.isSaleOfferBannerDismissed();
+        final shouldShow = !isDismissed;
         if (!mounted) {
           return;
         }
-        setState(() {
-          _offerRemaining = remaining;
-          _showOfferBanner = !isDismissed;
-        });
+        if (remainingSeconds != _lastRemainingSeconds ||
+            shouldShow != _lastOfferVisibility) {
+          setState(() {
+            _offerRemaining = remaining;
+            _showOfferBanner = shouldShow;
+          });
+          _lastRemainingSeconds = remainingSeconds;
+          _lastOfferVisibility = shouldShow;
+        }
       }
     });
   }
@@ -337,6 +356,7 @@ class _HomeScreenState extends State<HomeScreen>
     setState(() {
       _showOfferBanner = false;
     });
+    _lastOfferVisibility = false;
   }
 
   Future<void> _handleOfferBannerTapped() async {
@@ -380,6 +400,7 @@ class _HomeScreenState extends State<HomeScreen>
       barrierDismissible: false,
       builder: (dialogContext) {
         return Dialog(
+          insetPadding: EdgeInsets.symmetric(horizontal: 20.0),
           backgroundColor: AppColors.cardColorTheme(isDark),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
@@ -494,6 +515,58 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  Widget _buildEmptyStateCard(bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 32),
+      margin: const EdgeInsets.only(bottom: 14.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primaryColor,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryColor.withValues(alpha: 0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Icon(
+              LucideIcons.sparkles,
+              size: 34,
+              color: AppColors.darkBackgroundColor,
+            ),
+          ),
+          const SizedBox(height: 22),
+          Text(
+            "Your streak canvas is ready",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: AppColors.textColor(isDark),
+              fontWeight: FontWeight.w800,
+              fontSize: 26,
+              height: 1.2,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            "Start with one habit. Give it a name, set the cadence, and watch your dashboard light up with momentum.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: AppColors.greyColorTheme(isDark),
+              fontSize: 15,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAnimatedAddHabitButton(bool isDark) {
     return ScaleTransition(
       scale: _pulseAnimation,
@@ -534,7 +607,7 @@ class _HomeScreenState extends State<HomeScreen>
               ),
               const SizedBox(width: 12),
               Text(
-                "Design my first habit",
+                "Add my first streak",
                 style: GoogleFonts.poppins(
                   color: AppColors.darkBackgroundColor,
                   fontWeight: FontWeight.w700,

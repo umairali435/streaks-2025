@@ -6,6 +6,7 @@ import 'package:streaks/bloc/theme_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_state.dart';
 import 'package:streaks/screen/purchases_screen.dart';
+import 'package:streaks/screen/streak_details/widgets/custom_button.dart';
 
 class PremiumLockedWidget extends StatelessWidget {
   final Widget child;
@@ -56,7 +57,7 @@ class PremiumLockedWidget extends StatelessWidget {
                           children: [
                             Icon(
                               LucideIcons.crown,
-                              color: Colors.white,
+                              color: Color(0xFFffd700),
                               size: 40,
                             ),
                             const SizedBox(height: 8),

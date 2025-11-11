@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:streaks/models/cached_offering.dart';
 
 class PurchasesState extends Equatable {
   final bool isLoading;
@@ -8,6 +9,7 @@ class PurchasesState extends Equatable {
   final Package? selectedPackage;
   final int selectedIndex;
   final int totalStreaksLength;
+  final CachedOffering? cachedOffering;
 
   const PurchasesState({
     this.isLoading = false,
@@ -16,6 +18,7 @@ class PurchasesState extends Equatable {
     this.selectedPackage,
     this.selectedIndex = 0,
     this.totalStreaksLength = 0,
+    this.cachedOffering,
   });
 
   PurchasesState copyWith(
@@ -24,7 +27,8 @@ class PurchasesState extends Equatable {
       List<Offering>? offerings,
       Package? selectedPackage,
       int? selectedIndex,
-      int? totalStreaksLength}) {
+      int? totalStreaksLength,
+      CachedOffering? cachedOffering}) {
     return PurchasesState(
       isLoading: isLoading ?? this.isLoading,
       isSubscriptionActive: isSubscriptionActive ?? this.isSubscriptionActive,
@@ -32,6 +36,7 @@ class PurchasesState extends Equatable {
       selectedPackage: selectedPackage ?? this.selectedPackage,
       selectedIndex: selectedIndex ?? this.selectedIndex,
       totalStreaksLength: totalStreaksLength ?? this.totalStreaksLength,
+      cachedOffering: cachedOffering ?? this.cachedOffering,
     );
   }
 
@@ -43,5 +48,6 @@ class PurchasesState extends Equatable {
         selectedPackage,
         selectedIndex,
         totalStreaksLength,
+        cachedOffering,
       ];
 }

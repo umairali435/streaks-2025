@@ -10,7 +10,15 @@ abstract class PurchasesEvent extends Equatable {
 
 class InitPurchases extends PurchasesEvent {}
 
-class FetchOffers extends PurchasesEvent {}
+class FetchOffers extends PurchasesEvent {
+  final bool showLoading;
+  final bool forceRefresh;
+
+  const FetchOffers({this.showLoading = true, this.forceRefresh = false});
+
+  @override
+  List<Object?> get props => [showLoading, forceRefresh];
+}
 
 class PurchaseSubscription extends PurchasesEvent {
   final Package package;

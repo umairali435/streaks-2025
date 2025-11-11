@@ -1,10 +1,13 @@
-import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:streaks/database/streaks_database.dart';
+import 'package:streaks/models/cached_offering.dart';
+import 'package:streaks/services/offering_cache_service.dart';
+import 'package:streaks/services/share_prefs_services.dart';
+import 'package:streaks/services/purchases_initializer.dart';
 
 import 'purchases_event.dart';
 import 'purchases_state.dart';
@@ -21,24 +24,22 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
 
   Future<void> _onInit(
       InitPurchases event, Emitter<PurchasesState> emit) async {
+    final cached = await OfferingCacheService.getCachedOffering();
+    if (cached != null) {
+      emit(state.copyWith(cachedOffering: cached));
+    }
     await _initSubscription(emit);
-    add(FetchOffers());
+    add(const FetchOffers());
   }
 
   Future<void> _initSubscription(Emitter<PurchasesState> emit) async {
-    await Purchases.setLogLevel(LogLevel.debug);
-    late PurchasesConfiguration configuration;
-    if (Platform.isAndroid) {
-      configuration =
-          PurchasesConfiguration("goog_whruziDKNFJomxFBXTXiisBKHBR");
-    } else {
-      configuration =
-          PurchasesConfiguration("appl_KVYUCljoRyvHdMLJNmTqoYPmYQT");
-    }
-    await Purchases.configure(configuration);
+    await PurchasesInitializer.ensureConfigured();
 
     Purchases.addCustomerInfoUpdateListener((customerInfo) async {});
     CustomerInfo info = await Purchases.getCustomerInfo();
+    if (info.activeSubscriptions.isNotEmpty) {
+      await SharePrefsService.setSaleOfferBannerDismissed(true);
+    }
     emit(
       state.copyWith(
         isSubscriptionActive: info.activeSubscriptions.isNotEmpty,
@@ -48,21 +49,42 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
 
   Future<void> _onFetchOffers(
       FetchOffers event, Emitter<PurchasesState> emit) async {
+    if (!event.forceRefresh && state.offerings.isNotEmpty) {
+      return;
+    }
+
     try {
-      emit(state.copyWith(isLoading: true));
+      await PurchasesInitializer.ensureConfigured();
+      if (event.showLoading) {
+        emit(state.copyWith(isLoading: true));
+      }
       final offerings = await Purchases.getOfferings();
       final current = offerings.current;
-      Package? sale = current?.getPackage("11_nov_sale");
-      debugPrint(sale.toString());
-      debugPrint(current?.annual?.identifier.toString());
       if (current != null) {
-        emit(state.copyWith(offerings: [current], isLoading: false));
+        await OfferingCacheService.cacheOffering(current);
+        final CachedOffering cached = CachedOffering.fromOffering(current);
+        final Package? defaultPackage = current.weekly ??
+            current.annual ??
+            current.monthly ??
+            (current.availablePackages.isNotEmpty
+                ? current.availablePackages.first
+                : null);
+        final int defaultIndex =
+            defaultPackage == null || defaultPackage == current.weekly ? 0 : 1;
         emit(state.copyWith(
-          selectedPackage: current.weekly,
-          selectedIndex: 0,
+          offerings: [current],
+          isLoading: false,
+          cachedOffering: cached,
+          selectedPackage: defaultPackage,
+          selectedIndex: defaultIndex,
         ));
+      } else if (event.showLoading) {
+        emit(state.copyWith(isLoading: false));
       }
     } on PlatformException catch (e) {
+      if (event.showLoading) {
+        emit(state.copyWith(isLoading: false));
+      }
       Fluttertoast.showToast(
         msg: e.message.toString(),
         gravity: ToastGravity.BOTTOM,
@@ -81,7 +103,9 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       PurchaseSubscription event, Emitter<PurchasesState> emit) async {
     emit(state.copyWith(isLoading: true));
     try {
+      await PurchasesInitializer.ensureConfigured();
       await Purchases.purchasePackage(event.package);
+      await SharePrefsService.setSaleOfferBannerDismissed(true);
       emit(state.copyWith(isLoading: false, isSubscriptionActive: true));
       Fluttertoast.showToast(
         msg: "Your Purchase is Successfull",
@@ -102,12 +126,16 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       RestoreSubscription event, Emitter<PurchasesState> emit) async {
     emit(state.copyWith(isLoading: true));
     try {
+      await PurchasesInitializer.ensureConfigured();
       CustomerInfo customerInfo = await Purchases.restorePurchases();
       bool active = customerInfo.activeSubscriptions.isNotEmpty;
       emit(state.copyWith(
         isLoading: false,
         isSubscriptionActive: active,
       ));
+      if (active) {
+        await SharePrefsService.setSaleOfferBannerDismissed(true);
+      }
 
       if (!active) {
         Fluttertoast.showToast(

@@ -41,11 +41,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void initState() {
     super.initState();
     if (widget.showSubscriptionOnLaunch) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Future.microtask(() async {
         if (!mounted) return;
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const PurchasesScreen(),
+        final navigator = Navigator.of(context);
+        await navigator.push(
+          PageRouteBuilder(
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                PurchasesScreen(
+              onBack: () {
+                navigator.pop();
+              },
+            ),
           ),
         );
         if (!mounted) return;

@@ -14,9 +14,7 @@ import 'package:streaks/screen/add_screen.dart';
 import 'package:streaks/screen/premium_user.dart';
 import 'package:streaks/screen/purchases_screen.dart';
 import 'package:streaks/screen/streak_details/streak_detail_screen.dart';
-import 'package:streaks/screen/updates_screen.dart';
 import 'package:streaks/screen/settings_screen.dart';
-import 'package:streaks/services/share_prefs_services.dart';
 
 class StreakScreen extends StatefulWidget {
   const StreakScreen({super.key});
@@ -28,28 +26,7 @@ class StreakScreen extends StatefulWidget {
 class _StreakScreenState extends State<StreakScreen> {
   @override
   void initState() {
-    _checkAndShowWhatsNew();
     super.initState();
-  }
-
-  Future<void> _checkAndShowWhatsNew() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    bool shouldShow = await SharePrefsService.shouldShowWhatsNew();
-
-    if (shouldShow && mounted) {
-      _navigateToWhatsNew();
-    }
-  }
-
-  void _navigateToWhatsNew() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const WhatsNewScreen(
-          showMarkAsSeenButton: true,
-        ),
-      ),
-    );
   }
 
   @override

@@ -14,7 +14,12 @@ import 'package:streaks/screen/streak_details/widgets/custom_loading_widget.dart
 import 'package:url_launcher/url_launcher.dart';
 
 class PurchasesScreen extends StatefulWidget {
-  const PurchasesScreen({super.key});
+  final VoidCallback? onBack;
+
+  const PurchasesScreen({
+    super.key,
+    this.onBack,
+  });
 
   @override
   State<PurchasesScreen> createState() => _PurchasesScreenState();
@@ -31,7 +36,13 @@ class _PurchasesScreenState extends State<PurchasesScreen>
 
   @override
   void initState() {
-    context.read<PurchasesBloc>().add(FetchOffers());
+    final purchasesBloc = context.read<PurchasesBloc>();
+    final shouldShowLoading = purchasesBloc.state.offerings.isEmpty &&
+        purchasesBloc.state.cachedOffering == null;
+    purchasesBloc.add(FetchOffers(
+      showLoading: shouldShowLoading,
+      forceRefresh: true,
+    ));
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1200),
@@ -87,38 +98,47 @@ class _PurchasesScreenState extends State<PurchasesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeBloc, ThemeState>(
-      builder: (context, themeState) {
-        final isDark = themeState is ThemeLoaded ? themeState.isDark : true;
-        return Scaffold(
-          backgroundColor: AppColors.backgroundColor(isDark),
-          body: SafeArea(
-            child: BlocBuilder<PurchasesBloc, PurchasesState>(
-              builder: (context, state) {
-                return Column(
-                  children: [
-                    // Custom App Bar
-                    _buildCustomAppBar(isDark),
-
-                    state.isSubscriptionActive
-                        ? Expanded(child: _buildAlreadySubscribedView(isDark))
-                        : Expanded(
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                _buildPurchaseContent(state, isDark),
-                                if (state.isLoading)
-                                  _buildLoadingOverlay(isDark),
-                              ],
-                            ),
-                          ),
-                  ],
-                );
-              },
-            ),
-          ),
-        );
+    return WillPopScope(
+      onWillPop: () async {
+        if (widget.onBack != null) {
+          widget.onBack!.call();
+          return false;
+        }
+        return true;
       },
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, themeState) {
+          final isDark = themeState is ThemeLoaded ? themeState.isDark : true;
+          return Scaffold(
+            backgroundColor: AppColors.backgroundColor(isDark),
+            body: SafeArea(
+              child: BlocBuilder<PurchasesBloc, PurchasesState>(
+                builder: (context, state) {
+                  return Column(
+                    children: [
+                      // Custom App Bar
+                      _buildCustomAppBar(isDark),
+
+                      state.isSubscriptionActive
+                          ? Expanded(child: _buildAlreadySubscribedView(isDark))
+                          : Expanded(
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  _buildPurchaseContent(state, isDark),
+                                  if (state.isLoading)
+                                    _buildLoadingOverlay(isDark),
+                                ],
+                              ),
+                            ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -488,54 +508,128 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         return ScaleTransition(
           scale: _scaleAnimation,
           child: Column(
-            children: state.offerings.map(
-              (offers) {
-                int percentage = calculateSavingsPercentage(
-                  offers.weekly?.storeProduct.price ?? 0.0,
-                  offers.annual?.storeProduct.price ?? 0.0,
-                ).toInt();
-                return Column(
-                  children: [
-                    PackagesWidgets(
-                      title: "WEEKLY PLAN",
-                      subtitle:
-                          "${offers.weekly?.storeProduct.currencyCode} ${offers.weekly?.storeProduct.price.toStringAsFixed(2)} / Week",
-                      showTryForFree: false,
-                      selectedPackage: state.selectedIndex == 0 ? true : false,
-                      showPercentage: false,
-                      isDark: widget.isDark,
-                      onTap: () async {
-                        context
-                            .read<PurchasesBloc>()
-                            .add(SelectPackage(offers.weekly!, 0));
-                      },
-                    ),
-                    const Gap(25),
-                    PackagesWidgets(
-                      title: "YEARLY PLAN",
-                      subtitle:
-                          "${offers.annual?.storeProduct.currencyCode} ${offers.annual?.storeProduct.price.toStringAsFixed(2)} / Year",
-                      oldPrice:
-                          "${offers.annual?.storeProduct.currencyCode} ${((offers.monthly?.storeProduct.price ?? 0.0) * 12).toStringAsFixed(2)}",
-                      showTryForFree: false,
-                      selectedPackage: state.selectedIndex == 1 ? true : false,
-                      showPercentage: true,
-                      percentage: percentage.toInt().toString(),
-                      isDark: widget.isDark,
-                      onTap: () async {
-                        context
-                            .read<PurchasesBloc>()
-                            .add(SelectPackage(offers.annual!, 1));
-                      },
-                    ),
-                  ],
-                );
-              },
-            ).toList(),
+            children: _buildPackageOptions(context, state),
           ),
         );
       },
     );
+  }
+
+  List<Widget> _buildPackageOptions(
+      BuildContext context, PurchasesState state) {
+    final widgets = <Widget>[];
+
+    if (state.offerings.isNotEmpty) {
+      for (final offers in state.offerings) {
+        final weekly = offers.weekly;
+        final annual = offers.annual;
+        final monthly = offers.monthly;
+
+        if (weekly != null) {
+          widgets.add(
+            PackagesWidgets(
+              title: "WEEKLY PLAN",
+              subtitle:
+                  "${weekly.storeProduct.currencyCode} ${weekly.storeProduct.price.toStringAsFixed(2)} / Week",
+              showTryForFree: false,
+              selectedPackage: state.selectedIndex == 0,
+              showPercentage: false,
+              isDark: widget.isDark,
+              onTap: () {
+                context.read<PurchasesBloc>().add(SelectPackage(weekly, 0));
+              },
+            ),
+          );
+        }
+
+        if (weekly != null && annual != null) {
+          widgets.add(const Gap(25));
+        }
+
+        if (annual != null) {
+          final percentage = calculateSavingsPercentage(
+            weekly?.storeProduct.price ?? 0.0,
+            annual.storeProduct.price,
+          ).toInt();
+          final oldPrice = monthly != null
+              ? "${annual.storeProduct.currencyCode} ${(monthly.storeProduct.price * 12).toStringAsFixed(2)}"
+              : null;
+          widgets.add(
+            PackagesWidgets(
+              title: "YEARLY PLAN",
+              subtitle:
+                  "${annual.storeProduct.currencyCode} ${annual.storeProduct.price.toStringAsFixed(2)} / Year",
+              oldPrice: oldPrice,
+              showTryForFree: false,
+              selectedPackage: state.selectedIndex == 1,
+              showPercentage: weekly != null,
+              percentage: percentage.toString(),
+              isDark: widget.isDark,
+              onTap: () {
+                context.read<PurchasesBloc>().add(SelectPackage(annual, 1));
+              },
+            ),
+          );
+        }
+      }
+      return widgets;
+    }
+
+    final cached = state.cachedOffering;
+    if (cached != null) {
+      final weekly = cached.weekly;
+      final annual = cached.annual;
+      final monthly = cached.monthly;
+
+      if (weekly != null) {
+        widgets.add(
+          PackagesWidgets(
+            title: "WEEKLY PLAN",
+            subtitle: "${weekly.currencyCode} "
+                "${weekly.price.toStringAsFixed(2)} / Week",
+            showTryForFree: false,
+            selectedPackage: false,
+            showPercentage: false,
+            isDark: widget.isDark,
+            onTap: null,
+          ),
+        );
+      }
+
+      if (weekly != null && annual != null) {
+        widgets.add(const Gap(25));
+      }
+
+      if (annual != null) {
+        final percentage = weekly != null
+            ? calculateSavingsPercentage(weekly.price, annual.price).toInt()
+            : 0;
+        final oldPrice = monthly != null
+            ? "${annual.currencyCode} "
+                "${(monthly.price * 12).toStringAsFixed(2)}"
+            : null;
+
+        widgets.add(
+          PackagesWidgets(
+            title: "YEARLY PLAN",
+            subtitle: "${annual.currencyCode} "
+                "${annual.price.toStringAsFixed(2)} / Year",
+            oldPrice: oldPrice,
+            showTryForFree: false,
+            selectedPackage: false,
+            showPercentage: weekly != null,
+            percentage: percentage.toString(),
+            isDark: widget.isDark,
+            onTap: null,
+          ),
+        );
+      }
+
+      if (widgets.isNotEmpty) {
+        return widgets;
+      }
+    }
+    return widgets;
   }
 }
 
@@ -598,7 +692,7 @@ class PackagesWidgets extends StatelessWidget {
   final bool showPercentage;
   final String percentage;
   final bool isDark;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const PackagesWidgets({
     super.key,
@@ -610,7 +704,7 @@ class PackagesWidgets extends StatelessWidget {
     this.showPercentage = true,
     this.percentage = "",
     required this.isDark,
-    required this.onTap,
+    this.onTap,
   });
 
   @override

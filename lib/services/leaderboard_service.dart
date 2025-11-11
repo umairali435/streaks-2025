@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:streaks/database/streaks_database.dart';
 import 'package:streaks/services/auth_service.dart';
 import 'package:streaks/res/assets.dart';
+import 'package:streaks/services/purchases_initializer.dart';
 
 class LeaderboardService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -206,6 +207,7 @@ class LeaderboardService {
       // Check premium subscription status
       bool isPremium = false;
       try {
+        await PurchasesInitializer.ensureConfigured();
         final customerInfo = await Purchases.getCustomerInfo();
         isPremium = customerInfo.activeSubscriptions.isNotEmpty;
       } catch (e) {
