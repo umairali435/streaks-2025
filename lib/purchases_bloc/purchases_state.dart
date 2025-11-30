@@ -5,6 +5,7 @@ import 'package:streaks/models/cached_offering.dart';
 class PurchasesState extends Equatable {
   final bool isLoading;
   final bool isSubscriptionActive;
+  final bool isSubscriptionStatusLoaded;
   final List<Offering> offerings;
   final Package? selectedPackage;
   final int selectedIndex;
@@ -14,6 +15,7 @@ class PurchasesState extends Equatable {
   const PurchasesState({
     this.isLoading = false,
     this.isSubscriptionActive = false,
+    this.isSubscriptionStatusLoaded = false,
     this.offerings = const [],
     this.selectedPackage,
     this.selectedIndex = 0,
@@ -24,6 +26,7 @@ class PurchasesState extends Equatable {
   PurchasesState copyWith(
       {bool? isLoading,
       bool? isSubscriptionActive,
+      bool? isSubscriptionStatusLoaded,
       List<Offering>? offerings,
       Package? selectedPackage,
       int? selectedIndex,
@@ -32,6 +35,8 @@ class PurchasesState extends Equatable {
     return PurchasesState(
       isLoading: isLoading ?? this.isLoading,
       isSubscriptionActive: isSubscriptionActive ?? this.isSubscriptionActive,
+      isSubscriptionStatusLoaded:
+          isSubscriptionStatusLoaded ?? this.isSubscriptionStatusLoaded,
       offerings: offerings ?? this.offerings,
       selectedPackage: selectedPackage ?? this.selectedPackage,
       selectedIndex: selectedIndex ?? this.selectedIndex,
@@ -44,6 +49,7 @@ class PurchasesState extends Equatable {
   List<Object?> get props => [
         isLoading,
         isSubscriptionActive,
+        isSubscriptionStatusLoaded,
         offerings,
         selectedPackage,
         selectedIndex,

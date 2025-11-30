@@ -135,7 +135,7 @@ class _ReviewRequestScreenState extends State<ReviewRequestScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              "If Streaks 2025 is sparking momentum for you, a quick 5-star review helps more builders discover it.",
+                              "If Streaks 2025-26 is sparking momentum for you, a quick 5-star review helps more builders discover it.",
                               style: GoogleFonts.poppins(
                                 fontSize: 15,
                                 height: 1.5,
@@ -247,7 +247,7 @@ class _ReviewRequestScreenState extends State<ReviewRequestScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    "— Streaks 2025 creator community",
+                                    "— Streaks 2025-26 creator community",
                                     style: GoogleFonts.poppins(
                                       fontSize: 13,
                                       color: AppColors.greyColorTheme(isDark),

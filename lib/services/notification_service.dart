@@ -13,7 +13,8 @@ class NotificationService {
   static Future<void> initilizeTime() async {
     tz.initializeTimeZones();
     try {
-      final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+      final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+      final String currentTimeZone = timezoneInfo.identifier;
       tz.setLocalLocation(tz.getLocation(currentTimeZone));
     } catch (e) {
       tz.setLocalLocation(tz.getLocation('UTC'));

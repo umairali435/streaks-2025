@@ -287,7 +287,7 @@ class _SaleOfferScreenState extends State<SaleOfferScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '11.11 Celebration Sale',
+                  'Black Friday Sale',
                   style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
@@ -384,7 +384,7 @@ class _SaleOfferScreenState extends State<SaleOfferScreen> {
         const SizedBox(height: 18),
         if (comparePriceText != null)
           Text(
-            'Usually $comparePriceText — you’re claiming the 11.11 price.',
+            'Usually $comparePriceText — you\'re claiming the Black Friday price.',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               fontSize: 13,

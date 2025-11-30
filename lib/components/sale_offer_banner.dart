@@ -66,7 +66,7 @@ class SaleOfferBanner extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '11.11 Midnight Countdown',
+                        'Black Friday Midnight Countdown',
                         style: GoogleFonts.poppins(
                           fontSize: 14.0,
                           fontWeight: FontWeight.w700,

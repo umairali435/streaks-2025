@@ -46,7 +46,7 @@ class DataExportService {
       // Convert streaks to JSON
       final packageInfo = await PackageInfo.fromPlatform();
       final exportData = {
-        'app': 'Streaks 2025',
+        'app': 'Streaks 2025-26',
         'version': packageInfo.version,
         'exportDate': DateTime.now().toIso8601String(),
         'streaks': streaks
@@ -82,8 +82,8 @@ class DataExportService {
         ShareParams(
           files: [XFile(file.path)],
           text:
-              'My Streaks 2025 Backup\n\nExported on ${DateTime.now().toString().split('.')[0]}\nTotal streaks: ${streaks.length}',
-          subject: 'Streaks 2025 Backup',
+              'My Streaks 2025-26 Backup\n\nExported on ${DateTime.now().toString().split('.')[0]}\nTotal streaks: ${streaks.length}',
+          subject: 'Streaks 2025-26 Backup',
         ),
       );
 

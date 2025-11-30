@@ -287,8 +287,10 @@ class ProfileScreenState extends State<ProfileScreen> {
     bool isDark,
     LeaderboardState leaderboardState,
   ) {
-    final photoUrl = AuthService.photoUrl;
-    final displayName = AuthService.displayName ?? 'User';
+    final displayName =
+        AuthService.displayName != null && AuthService.displayName!.isNotEmpty
+            ? AuthService.displayName!
+            : 'Anonymous';
     final email = AuthService.email ?? '';
     final level = _userStats?['level'] as int? ?? 1;
 
@@ -305,16 +307,14 @@ class ProfileScreenState extends State<ProfileScreen> {
             children: [
               CircleAvatar(
                 radius: 40,
-                backgroundImage: photoUrl != null && photoUrl.isNotEmpty
-                    ? NetworkImage(photoUrl)
-                    : null,
-                child: photoUrl == null || photoUrl.isEmpty
-                    ? Icon(
-                        LucideIcons.user,
-                        size: 40,
-                        color: AppColors.textColor(isDark),
-                      )
-                    : null,
+                child: Text(
+                  displayName.substring(0, 1).toUpperCase(),
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textColor(isDark),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
               ),
               Positioned(
                 bottom: 0,

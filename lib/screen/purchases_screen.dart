@@ -143,50 +143,59 @@ class _PurchasesScreenState extends State<PurchasesScreen>
   }
 
   Widget _buildCustomAppBar(bool isDark) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => SaleOfferScreen()),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color:
-                      AppColors.backgroundColor(isDark).withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.primaryColor.withValues(alpha: 0.3),
+    return BlocBuilder<PurchasesBloc, PurchasesState>(
+      builder: (context, state) {
+        return FadeTransition(
+          opacity: _fadeAnimation,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    if (state.isSubscriptionActive) {
+                      Navigator.of(context).pop();
+                    } else {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                            builder: (context) => SaleOfferScreen()),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.backgroundColor(isDark)
+                          .withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.primaryColor.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Icon(
+                      LucideIcons.chevronLeft,
+                      color: AppColors.textColor(isDark),
+                      size: 20,
+                    ),
                   ),
                 ),
-                child: Icon(
-                  LucideIcons.chevronLeft,
-                  color: AppColors.textColor(isDark),
-                  size: 20,
+                Expanded(
+                  child: Text(
+                    'Premium Upgrade',
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textColor(isDark),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
+                const SizedBox(width: 44), // Balance the back button
+              ],
             ),
-            Expanded(
-              child: Text(
-                'Premium Upgrade',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textColor(isDark),
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(width: 44), // Balance the back button
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

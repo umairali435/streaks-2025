@@ -43,6 +43,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
     emit(
       state.copyWith(
         isSubscriptionActive: info.activeSubscriptions.isNotEmpty,
+        isSubscriptionStatusLoaded: true,
       ),
     );
   }
@@ -60,6 +61,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       }
       final offerings = await Purchases.getOfferings();
       final current = offerings.current;
+
       if (current != null) {
         await OfferingCacheService.cacheOffering(current);
         final CachedOffering cached = CachedOffering.fromOffering(current);
@@ -106,7 +108,11 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       await PurchasesInitializer.ensureConfigured();
       await Purchases.purchasePackage(event.package);
       await SharePrefsService.setSaleOfferBannerDismissed(true);
-      emit(state.copyWith(isLoading: false, isSubscriptionActive: true));
+      emit(state.copyWith(
+        isLoading: false,
+        isSubscriptionActive: true,
+        isSubscriptionStatusLoaded: true,
+      ));
       Fluttertoast.showToast(
         msg: "Your Purchase is Successfull",
         gravity: ToastGravity.TOP,
@@ -132,6 +138,7 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
       emit(state.copyWith(
         isLoading: false,
         isSubscriptionActive: active,
+        isSubscriptionStatusLoaded: true,
       ));
       if (active) {
         await SharePrefsService.setSaleOfferBannerDismissed(true);

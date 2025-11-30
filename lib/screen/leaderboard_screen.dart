@@ -293,6 +293,11 @@ class LeaderboardScreen extends StatelessWidget {
       orElse: () => {},
     );
 
+    final displayName = userEntry['displayName'] as String?;
+    final nameInitial = displayName != null && displayName.isNotEmpty
+        ? displayName.substring(0, 1).toUpperCase()
+        : 'U';
+
     if (userEntry.isEmpty) {
       return Container(
         margin: const EdgeInsets.all(16),
@@ -308,12 +313,14 @@ class LeaderboardScreen extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundImage: state.user?.photoURL != null
-                  ? NetworkImage(state.user!.photoURL!)
-                  : null,
-              child: state.user?.photoURL == null
-                  ? Icon(LucideIcons.user, color: AppColors.textColor(isDark))
-                  : null,
+              child: Text(
+                nameInitial,
+                style: GoogleFonts.poppins(
+                  color: AppColors.textColor(isDark),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
             ),
             const Gap(16),
             Expanded(
@@ -321,7 +328,9 @@ class LeaderboardScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    state.user?.displayName ?? 'User',
+                    displayName != null && displayName.isNotEmpty
+                        ? displayName
+                        : 'Anonymous',
                     style: GoogleFonts.poppins(
                       color: AppColors.textColor(isDark),
                       fontWeight: FontWeight.w600,
@@ -381,13 +390,14 @@ class LeaderboardScreen extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundImage: state.user?.photoURL != null
-                    ? NetworkImage(state.user!.photoURL!)
-                    : null,
-                child: state.user?.photoURL == null
-                    ? Icon(LucideIcons.user,
-                        size: 28, color: AppColors.textColor(isDark))
-                    : null,
+                child: Text(
+                  nameInitial,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textColor(isDark),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
               ),
               Positioned(
                 bottom: 0,
@@ -423,7 +433,9 @@ class LeaderboardScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        state.user?.displayName ?? 'User',
+                        displayName != null && displayName.isNotEmpty
+                            ? displayName
+                            : 'Anonymous',
                         style: GoogleFonts.poppins(
                           color: AppColors.textColor(isDark),
                           fontWeight: FontWeight.bold,
@@ -502,8 +514,12 @@ class LeaderboardScreen extends StatelessWidget {
     final level = entry['level'] as int;
     final totalStreaks = entry['totalStreaks'] as int;
     final totalCompletedStreaks = entry['totalCompletedStreaks'] as int;
-    final displayName = entry['displayName'] as String;
+    final String? displayName = entry['displayName'] as String?;
     final photoUrl = entry['photoUrl'] as String?;
+
+    final nameInitial = displayName != null && displayName.isNotEmpty
+        ? displayName.substring(0, 1).toUpperCase()
+        : 'U';
 
     // Medal colors for top 3
     Color? rankColor;
@@ -561,12 +577,14 @@ class LeaderboardScreen extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundImage: photoUrl != null && photoUrl.isNotEmpty
-                    ? NetworkImage(photoUrl)
-                    : null,
-                child: photoUrl == null || photoUrl.isEmpty
-                    ? Icon(LucideIcons.user, color: AppColors.textColor(isDark))
-                    : null,
+                child: Text(
+                  nameInitial,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textColor(isDark),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
               ),
               Positioned(
                 bottom: 0,
@@ -600,7 +618,9 @@ class LeaderboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  displayName,
+                  displayName != null && displayName.isNotEmpty
+                      ? displayName
+                      : 'Anonymous',
                   style: GoogleFonts.poppins(
                     color: AppColors.textColor(isDark),
                     fontWeight: FontWeight.w600,

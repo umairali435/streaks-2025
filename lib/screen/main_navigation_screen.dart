@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:streaks/bloc/streaks_bloc.dart';
-import 'package:streaks/res/colors.dart';
 import 'package:streaks/bloc/theme_bloc.dart';
+import 'package:streaks/purchases_bloc/purchases_bloc.dart';
+import 'package:streaks/purchases_bloc/purchases_state.dart';
+import 'package:streaks/res/colors.dart';
 import 'package:streaks/screen/home_screen.dart';
 import 'package:streaks/screen/report_screen.dart';
 import 'package:streaks/screen/leaderboard_screen.dart';
@@ -25,6 +27,7 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
+  bool _hasPresentedSubscription = false;
 
   // GlobalKeys to access screen states for reloading
   final GlobalKey<ReportScreenState> _reportScreenKey = GlobalKey<ReportScreenState>();
@@ -41,88 +44,115 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void initState() {
     super.initState();
     if (widget.showSubscriptionOnLaunch) {
-      Future.microtask(() async {
-        if (!mounted) return;
-        final navigator = Navigator.of(context);
-        await navigator.push(
-          PageRouteBuilder(
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                PurchasesScreen(
-              onBack: () {
-                navigator.pop();
-              },
-            ),
-          ),
-        );
-        if (!mounted) return;
-        SharePrefsService.setFirstHabitDialogPending();
-        context.read<StreaksBloc>().add(LoadStreaks());
-      });
+      _presentSubscriptionScreen(setFirstHabitDialogPending: true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeBloc, ThemeState>(
-      builder: (context, themeState) {
-        final isDark = themeState is ThemeLoaded ? themeState.isDark : true;
+    return BlocListener<PurchasesBloc, PurchasesState>(
+      listener: (context, state) {
+        if (state.isSubscriptionActive) {
+          _hasPresentedSubscription = false;
+          return;
+        }
 
-        return Scaffold(
-          backgroundColor: AppColors.backgroundColor(isDark),
-          body: IndexedStack(
-            index: _currentIndex,
-            children: _screens,
-          ),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              color: AppColors.cardColorTheme(isDark),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
+        if (!state.isSubscriptionStatusLoaded) {
+          return;
+        }
+
+        if (!_hasPresentedSubscription) {
+          _presentSubscriptionScreen();
+        }
+      },
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, themeState) {
+          final isDark = themeState is ThemeLoaded ? themeState.isDark : true;
+
+          return Scaffold(
+            backgroundColor: AppColors.backgroundColor(isDark),
+            body: IndexedStack(
+              index: _currentIndex,
+              children: _screens,
             ),
-            child: SafeArea(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildNavItem(
-                      icon: LucideIcons.home,
-                      label: 'Home',
-                      index: 0,
-                      isDark: isDark,
-                    ),
-                    _buildNavItem(
-                      icon: LucideIcons.barChart3,
-                      label: 'Report',
-                      index: 1,
-                      isDark: isDark,
-                    ),
-                    _buildNavItem(
-                      icon: LucideIcons.trophy,
-                      label: 'Leaderboard',
-                      index: 2,
-                      isDark: isDark,
-                    ),
-                    _buildNavItem(
-                      icon: LucideIcons.user,
-                      label: 'Profile',
-                      index: 3,
-                      isDark: isDark,
-                    ),
-                  ],
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                color: AppColors.cardColorTheme(isDark),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildNavItem(
+                        icon: LucideIcons.home,
+                        label: 'Home',
+                        index: 0,
+                        isDark: isDark,
+                      ),
+                      _buildNavItem(
+                        icon: LucideIcons.barChart3,
+                        label: 'Report',
+                        index: 1,
+                        isDark: isDark,
+                      ),
+                      _buildNavItem(
+                        icon: LucideIcons.trophy,
+                        label: 'Leaderboard',
+                        index: 2,
+                        isDark: isDark,
+                      ),
+                      _buildNavItem(
+                        icon: LucideIcons.user,
+                        label: 'Profile',
+                        index: 3,
+                        isDark: isDark,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
+    );
+  }
+
+  void _presentSubscriptionScreen({bool setFirstHabitDialogPending = false}) {
+    if (!mounted || _hasPresentedSubscription) return;
+    _hasPresentedSubscription = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await _openSubscriptionScreen();
+      if (!mounted) return;
+      if (setFirstHabitDialogPending) {
+        SharePrefsService.setFirstHabitDialogPending();
+      }
+      context.read<StreaksBloc>().add(LoadStreaks());
+    });
+  }
+
+  Future<void> _openSubscriptionScreen() async {
+    final navigator = Navigator.of(context);
+    await navigator.push(
+      PageRouteBuilder(
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        pageBuilder: (context, animation, secondaryAnimation) => PurchasesScreen(
+          onBack: () {
+            navigator.pop();
+          },
+        ),
+      ),
     );
   }
 

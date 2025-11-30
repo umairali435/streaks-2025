@@ -467,15 +467,27 @@ class _StreakContainerState extends State<StreakContainer> {
                               ),
                               child: Center(
                                 child: isDayChecked
-                                    ? Icon(
-                                        LucideIcons.check,
-                                        color: isDayChecked
-                                            ? AppColors.backgroundColor(isDark)
-                                            : isDayActive
-                                                ? Color(widget.streak.colorCode)
-                                                : AppColors.backgroundColor(
-                                                    isDark),
-                                        size: 16.0,
+                                    ? Container(
+                                        height: 18.0,
+                                        width: 18.0,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppColors.blackColor
+                                              .withValues(alpha: 0.8),
+                                        ),
+                                        child: Icon(
+                                          LucideIcons.check,
+                                          color: isDayChecked
+                                              ? AppColors.whiteColor
+                                              : isDayActive
+                                                  ? Color(
+                                                      widget.streak.colorCode,
+                                                    )
+                                                  : AppColors.backgroundColor(
+                                                      isDark,
+                                                    ),
+                                          size: 10.0,
+                                        ),
                                       )
                                     : Container(),
                               ),

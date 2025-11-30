@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen>
             elevation: 0,
             centerTitle: true,
             title: Text(
-              "Streaks 2025",
+              "Streaks 2025-26",
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w900,
                 fontSize: 18.0,

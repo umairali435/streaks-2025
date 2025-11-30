@@ -402,7 +402,7 @@ class ReportScreenState extends State<ReportScreen> {
                 enabled: true,
                 touchTooltipData: BarTouchTooltipData(
                   getTooltipColor: (_) => AppColors.cardColorTheme(isDark),
-                  tooltipRoundedRadius: 8,
+                  tooltipBorderRadius: BorderRadius.circular(8),
                   tooltipPadding: const EdgeInsets.all(8),
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     final date = entries[groupIndex].key;
@@ -578,7 +578,7 @@ class ReportScreenState extends State<ReportScreen> {
                 enabled: true,
                 touchTooltipData: BarTouchTooltipData(
                   getTooltipColor: (_) => AppColors.cardColorTheme(isDark),
-                  tooltipRoundedRadius: 8,
+                  tooltipBorderRadius: BorderRadius.circular(8),
                   tooltipPadding: const EdgeInsets.all(8),
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     return BarTooltipItem(

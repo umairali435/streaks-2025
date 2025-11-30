@@ -10,7 +10,7 @@ class AppUtils {
   AppUtils._();
   static const String _androidPackageName = 'com.extendztech.streaks';
   static const String _iosAppId = '6740426283';
-  static const String _appName = 'Streaks 2025 - Habit Tracker';
+  static const String _appName = 'Streaks 2025-26 - Habit Tracker';
   static const String _appDescription =
       'Build better habits and track your progress!';
 
