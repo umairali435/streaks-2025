@@ -343,7 +343,6 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
             leading: IconButton(
               icon: Icon(
                 LucideIcons.chevronLeft,
-                color: AppColors.darkBackgroundColor,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -354,14 +353,12 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w900,
                 fontSize: 18.0,
-                color: AppColors.darkBackgroundColor,
               ),
             ),
             actions: [
               IconButton(
                 icon: Icon(
                   LucideIcons.edit,
-                  color: AppColors.darkBackgroundColor,
                 ),
                 onPressed: () {
                   Navigator.of(context).push(
@@ -376,7 +373,6 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
               IconButton(
                 icon: Icon(
                   LucideIcons.trash,
-                  color: AppColors.darkBackgroundColor,
                 ),
                 onPressed: () async {
                   final dialogWidget = Platform.isAndroid
@@ -528,6 +524,17 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
                   builder: (context, themeState) {
                     final dotsIsDark =
                         themeState is ThemeLoaded ? themeState.isDark : true;
+                    return PremiumLockedWidget(
+                      child: _Last14DaysDotsWidget(
+                          streak: widget.streak, isDark: dotsIsDark),
+                    );
+                  },
+                ),
+                const Gap(20.0),
+                BlocBuilder<ThemeBloc, ThemeState>(
+                  builder: (context, themeState) {
+                    final dotsIsDark =
+                        themeState is ThemeLoaded ? themeState.isDark : true;
                     return StreaksDotsWidget(
                         streak: widget.streak, isDark: dotsIsDark);
                   },
@@ -536,6 +543,11 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
                 PremiumLockedWidget(
                   child: Card(
                     color: AppColors.cardColorTheme(isDark),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.borderRadius),
+                      side: BorderSide(color: AppColors.darkBorderColor),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: HeatMapCalendar(
@@ -621,149 +633,152 @@ class _CombinedChartsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppColors.cardColorTheme(isDark),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with dropdown
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Analytics',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textColor(isDark),
+    return PremiumLockedWidget(
+      child: Card(
+        color: AppColors.cardColorTheme(isDark),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+          side: BorderSide(color: AppColors.darkBorderColor),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with dropdown
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Analytics',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textColor(isDark),
+                    ),
                   ),
-                ),
-                PopupMenuButton<ChartFilter>(
-                  color: AppColors.cardColorTheme(isDark),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppConstants.borderRadius),
-                  ),
-                  onSelected: onFilterChanged,
-                  itemBuilder: (context) => [
-                    PopupMenuItem<ChartFilter>(
-                      value: ChartFilter.weekly,
-                      child: Text(
-                        'Weekly',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: selectedFilter == ChartFilter.weekly
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                          color: selectedFilter == ChartFilter.weekly
-                              ? Color(streak.colorCode)
-                              : AppColors.textColor(isDark),
-                        ),
-                      ),
+                  PopupMenuButton<ChartFilter>(
+                    color: AppColors.cardColorTheme(isDark),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.borderRadius),
                     ),
-                    PopupMenuItem<ChartFilter>(
-                      value: ChartFilter.monthly,
-                      child: Text(
-                        'Monthly',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: selectedFilter == ChartFilter.monthly
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                          color: selectedFilter == ChartFilter.monthly
-                              ? Color(streak.colorCode)
-                              : AppColors.textColor(isDark),
-                        ),
-                      ),
-                    ),
-                    PopupMenuItem<ChartFilter>(
-                      value: ChartFilter.yearly,
-                      child: Text(
-                        'Yearly',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: selectedFilter == ChartFilter.yearly
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                          color: selectedFilter == ChartFilter.yearly
-                              ? Color(streak.colorCode)
-                              : AppColors.textColor(isDark),
-                        ),
-                      ),
-                    ),
-                  ],
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0,
-                      vertical: 6.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondaryColorTheme(isDark),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Color(streak.colorCode),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _getFilterLabel(selectedFilter),
+                    onSelected: onFilterChanged,
+                    itemBuilder: (context) => [
+                      PopupMenuItem<ChartFilter>(
+                        value: ChartFilter.weekly,
+                        child: Text(
+                          'Weekly',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(streak.colorCode),
+                            fontWeight: selectedFilter == ChartFilter.weekly
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                            color: selectedFilter == ChartFilter.weekly
+                                ? Color(streak.colorCode)
+                                : AppColors.textColor(isDark),
                           ),
                         ),
-                        const Gap(6),
-                        Icon(
-                          LucideIcons.chevronDown,
-                          size: 16,
-                          color: Color(streak.colorCode),
+                      ),
+                      PopupMenuItem<ChartFilter>(
+                        value: ChartFilter.monthly,
+                        child: Text(
+                          'Monthly',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: selectedFilter == ChartFilter.monthly
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                            color: selectedFilter == ChartFilter.monthly
+                                ? Color(streak.colorCode)
+                                : AppColors.textColor(isDark),
+                          ),
                         ),
-                      ],
+                      ),
+                      PopupMenuItem<ChartFilter>(
+                        value: ChartFilter.yearly,
+                        child: Text(
+                          'Yearly',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: selectedFilter == ChartFilter.yearly
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                            color: selectedFilter == ChartFilter.yearly
+                                ? Color(streak.colorCode)
+                                : AppColors.textColor(isDark),
+                          ),
+                        ),
+                      ),
+                    ],
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0,
+                        vertical: 6.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.secondaryColorTheme(isDark),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Color(streak.colorCode),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _getFilterLabel(selectedFilter),
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(streak.colorCode),
+                            ),
+                          ),
+                          const Gap(6),
+                          Icon(
+                            LucideIcons.chevronDown,
+                            size: 16,
+                            color: Color(streak.colorCode),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                ],
+              ),
+              const Gap(24),
+              // Most Completed Chart
+              Text(
+                'Most Completed',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textColor(isDark),
                 ),
-              ],
-            ),
-            const Gap(24),
-            // Most Completed Chart
-            Text(
-              'Most Completed',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textColor(isDark),
               ),
-            ),
-            const Gap(16),
-            SizedBox(
-              height: 150,
-              child: _buildCompletedChart(),
-            ),
-            const Gap(32),
-            // Most Missed Chart
-            Text(
-              'Most Missed',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textColor(isDark),
+              const Gap(16),
+              SizedBox(
+                height: 150,
+                child: _buildCompletedChart(),
               ),
-            ),
-            const Gap(16),
-            SizedBox(
-              height: 150,
-              child: _buildMissedChart(),
-            ),
-          ],
+              const Gap(32),
+              // Most Missed Chart
+              Text(
+                'Most Missed',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textColor(isDark),
+                ),
+              ),
+              const Gap(16),
+              SizedBox(
+                height: 150,
+                child: _buildMissedChart(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1059,6 +1074,7 @@ class _StreaksDotsWidgetState extends State<StreaksDotsWidget> {
         decoration: BoxDecoration(
           color: AppColors.cardColorTheme(widget.isDark),
           borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+          border: Border.all(color: AppColors.darkBorderColor),
         ),
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -1229,6 +1245,86 @@ class _StreaksDotsWidgetState extends State<StreaksDotsWidget> {
   }
 }
 
+class _Last14DaysDotsWidget extends StatelessWidget {
+  final Streak streak;
+  final bool isDark;
+
+  const _Last14DaysDotsWidget({
+    required this.streak,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Get the last 14 days (from today going back 13 days)
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final last14Days = List.generate(14, (index) {
+      return today.subtract(Duration(days: 13 - index));
+    });
+
+    // Create a Set of completed dates for efficient lookup
+    final completedDatesSet =
+        streak.streakDates.map((d) => DateTime(d.year, d.month, d.day)).toSet();
+
+    // Check which days were completed
+    final completionData = last14Days.map((date) {
+      final dateOnly = DateTime(date.year, date.month, date.day);
+      return completedDatesSet.contains(dateOnly);
+    }).toList();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.cardColorTheme(isDark),
+        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+        border: Border.all(color: AppColors.darkBorderColor),
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Last 14 Days',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textColor(isDark),
+              fontSize: 18.0,
+            ),
+          ),
+          const Gap(16.0),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const int totalDots = 14;
+              const double spacing = 4; // space between dots
+              final double availableWidth = constraints.maxWidth;
+              final double dotSize =
+                  (availableWidth - (spacing * (totalDots - 1))) / totalDots;
+
+              return Row(
+                children: List.generate(totalDots, (index) {
+                  final isCompleted = completionData[index];
+                  return Container(
+                    width: dotSize,
+                    height: dotSize,
+                    margin: EdgeInsets.only(
+                        right: index == totalDots - 1 ? 0 : spacing),
+                    decoration: BoxDecoration(
+                      color: isCompleted
+                          ? Color(streak.colorCode)
+                          : AppColors.greyColorTheme(isDark).withAlpha(100),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  );
+                }),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _BadgeDisplayWidget extends StatelessWidget {
   final Streak streak;
   final int currentStreak;
@@ -1252,6 +1348,7 @@ class _BadgeDisplayWidget extends StatelessWidget {
         color: AppColors.cardColorTheme(isDark),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+          side: BorderSide(color: AppColors.darkBorderColor),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -1308,6 +1405,7 @@ class _BadgeDisplayWidget extends StatelessWidget {
       color: AppColors.cardColorTheme(isDark),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+        side: BorderSide(color: AppColors.darkBorderColor),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),

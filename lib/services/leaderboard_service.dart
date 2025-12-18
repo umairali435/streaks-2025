@@ -57,12 +57,12 @@ class LeaderboardService {
 
   /// Calculate completed streak days - days where ALL habits that are active on that day were completed
   /// This ignores inactive days (days that aren't scheduled for any habit)
-  /// 
+  ///
   /// Rules:
   /// - 1 habit: Day 1 completion = 1 completed streak day = Overall Level 1
   /// - 2+ habits: First day when ALL active habits complete together = 1 completed streak day = Overall Level 1
   /// - Inactive days don't count - if a habit isn't scheduled on a day, it doesn't need to complete
-  /// 
+  ///
   /// Example: Habit A (Mon-Fri), Habit B (Mon-Wed):
   ///   - Mon-Wed: Count if both completed (both are active)
   ///   - Thu-Fri: Don't count (B is inactive, so only A needs to complete, but we require ALL active habits)
@@ -117,7 +117,7 @@ class LeaderboardService {
 
       for (int i = 0; i < streaks.length; i++) {
         final isActive = _isActiveDayForHabit(streaks[i], dateOnly);
-        
+
         if (isActive) {
           hasActiveHabits = true;
           // If this habit is active on this day, it must be completed
@@ -144,7 +144,7 @@ class LeaderboardService {
     final streaks = await StreaksDatabase.getAllStreaks();
 
     int totalStreaks = streaks.length;
-    
+
     // Calculate completed streak days (days where ALL habits were completed)
     // This is the new metric for overall level
     int totalCompletedStreakDays = _calculateCompletedStreakDays(streaks);
@@ -153,7 +153,8 @@ class LeaderboardService {
 
     return {
       'totalStreaks': totalStreaks,
-      'totalCompletedStreaks': totalCompletedStreakDays, // Now represents completed streak days
+      'totalCompletedStreaks':
+          totalCompletedStreakDays, // Now represents completed streak days
       'level': level,
     };
   }
@@ -268,6 +269,7 @@ class LeaderboardService {
 
       for (var doc in querySnapshot.docs) {
         final data = doc.data();
+        debugPrint('data: $data');
         leaderboard.add({
           'userId': doc.id,
           'displayName': data['displayName'] ?? 'Anonymous',
@@ -277,6 +279,7 @@ class LeaderboardService {
           'totalCompletedStreaks': data['totalCompletedStreaks'] ?? 0,
           'level': data['level'] ?? 1,
           'rank': leaderboard.length + 1,
+          'isPremium': data['isPremium'] ?? false,
         });
       }
 

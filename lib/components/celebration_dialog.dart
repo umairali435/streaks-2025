@@ -101,29 +101,6 @@ class _CelebrationDialogState extends State<CelebrationDialog>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: ConfettiWidget(
-                  confettiController: _confettiController,
-                  blastDirection: 3.14 / 2,
-                  maxBlastForce: 5,
-                  minBlastForce: 2,
-                  emissionFrequency: 0.05,
-                  numberOfParticles: 20,
-                  gravity: 0.1,
-                  shouldLoop: false,
-                  colors: const [
-                    Colors.green,
-                    Colors.blue,
-                    Colors.pink,
-                    Colors.orange,
-                    Colors.purple,
-                    Colors.yellow,
-                    Colors.red,
-                    Colors.cyan,
-                  ],
-                ),
-              ),
               ScaleTransition(
                 scale: _scaleAnimation,
                 child: FadeTransition(
@@ -262,6 +239,29 @@ class _CelebrationDialogState extends State<CelebrationDialog>
                       ],
                     ),
                   ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirection: 3.14 / 2,
+                  maxBlastForce: 5,
+                  minBlastForce: 2,
+                  emissionFrequency: 0.05,
+                  numberOfParticles: 20,
+                  gravity: 0.1,
+                  shouldLoop: false,
+                  colors: const [
+                    Colors.green,
+                    Colors.blue,
+                    Colors.pink,
+                    Colors.orange,
+                    Colors.purple,
+                    Colors.yellow,
+                    Colors.red,
+                    Colors.cyan,
+                  ],
                 ),
               ),
             ],

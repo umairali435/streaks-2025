@@ -30,8 +30,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   bool _hasPresentedSubscription = false;
 
   // GlobalKeys to access screen states for reloading
-  final GlobalKey<ReportScreenState> _reportScreenKey = GlobalKey<ReportScreenState>();
-  final GlobalKey<ProfileScreenState> _profileScreenKey = GlobalKey<ProfileScreenState>();
+  final GlobalKey<ReportScreenState> _reportScreenKey =
+      GlobalKey<ReportScreenState>();
+  final GlobalKey<ProfileScreenState> _profileScreenKey =
+      GlobalKey<ProfileScreenState>();
 
   late final List<Widget> _screens = [
     const HomeScreen(),
@@ -147,11 +149,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       PageRouteBuilder(
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        pageBuilder: (context, animation, secondaryAnimation) => PurchasesScreen(
-          onBack: () {
-            navigator.pop();
-          },
-        ),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            PurchasesScreen(),
       ),
     );
   }

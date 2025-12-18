@@ -2,469 +2,170 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:streaks/bloc/theme_bloc.dart';
+import 'package:streaks/models/cached_offering.dart';
 import 'package:streaks/purchases_bloc/purchases_bloc.dart';
 import 'package:streaks/purchases_bloc/purchases_event.dart';
 import 'package:streaks/purchases_bloc/purchases_state.dart';
 import 'package:streaks/res/colors.dart';
 import 'package:streaks/screen/sale_offer_screen.dart';
-import 'package:streaks/screen/streak_details/widgets/custom_loading_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PurchasesScreen extends StatefulWidget {
-  final VoidCallback? onBack;
-
-  const PurchasesScreen({
-    super.key,
-    this.onBack,
-  });
+  const PurchasesScreen({super.key});
 
   @override
   State<PurchasesScreen> createState() => _PurchasesScreenState();
 }
 
-class _PurchasesScreenState extends State<PurchasesScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late AnimationController _floatingController;
-  late AnimationController _particleController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _slideAnimation;
-  late Animation<double> _floatingAnimation;
-
+class _PurchasesScreenState extends State<PurchasesScreen> {
   @override
   void initState() {
-    final purchasesBloc = context.read<PurchasesBloc>();
-    final shouldShowLoading = purchasesBloc.state.offerings.isEmpty &&
-        purchasesBloc.state.cachedOffering == null;
-    purchasesBloc.add(FetchOffers(
-      showLoading: shouldShowLoading,
-      forceRefresh: true,
-    ));
-
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-    _floatingController = AnimationController(
-      duration: const Duration(milliseconds: 3000),
-      vsync: this,
-    );
-    _particleController = AnimationController(
-      duration: const Duration(milliseconds: 5000),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
-
-    _slideAnimation = Tween<double>(
-      begin: 50.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _floatingAnimation = Tween<double>(
-      begin: -8,
-      end: 8,
-    ).animate(CurvedAnimation(
-      parent: _floatingController,
-      curve: Curves.easeInOut,
-    ));
-
-    _controller.forward();
-    _floatingController.repeat(reverse: true);
-    _particleController.repeat();
-
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _floatingController.dispose();
-    _particleController.dispose();
-    super.dispose();
+    final purchasesBloc = context.read<PurchasesBloc>();
+    if (purchasesBloc.state.offerings.isEmpty) {
+      purchasesBloc
+          .add(const FetchOffers(forceRefresh: true, showLoading: true));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (widget.onBack != null) {
-          widget.onBack!.call();
-          return false;
-        }
-        return true;
-      },
-      child: BlocBuilder<ThemeBloc, ThemeState>(
-        builder: (context, themeState) {
-          final isDark = themeState is ThemeLoaded ? themeState.isDark : true;
-          return Scaffold(
-            backgroundColor: AppColors.backgroundColor(isDark),
-            body: SafeArea(
-              child: BlocBuilder<PurchasesBloc, PurchasesState>(
-                builder: (context, state) {
-                  return Column(
-                    children: [
-                      // Custom App Bar
-                      _buildCustomAppBar(isDark),
-
-                      state.isSubscriptionActive
-                          ? Expanded(child: _buildAlreadySubscribedView(isDark))
-                          : Expanded(
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  _buildPurchaseContent(state, isDark),
-                                  if (state.isLoading)
-                                    _buildLoadingOverlay(isDark),
-                                ],
-                              ),
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, themeState) {
+        final isDark = themeState is ThemeLoaded ? themeState.isDark : true;
+        return Scaffold(
+          backgroundColor: AppColors.backgroundColor(isDark),
+          body: SafeArea(
+            child: BlocConsumer<PurchasesBloc, PurchasesState>(
+              listener: (context, state) {
+                if (state.isSubscriptionActive) {
+                  // If needed, navigate or show success
+                }
+              },
+              builder: (context, state) {
+                return Column(
+                  children: [
+                    state.isSubscriptionActive
+                        ? Expanded(child: Subscribed(isDark: isDark))
+                        : Expanded(
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                ListView(
+                                  padding: EdgeInsets.zero,
+                                  children: [
+                                    const Gap(20.0),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                        child: Image.asset(
+                                          "assets/app_icon.png",
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.10,
+                                        ),
+                                      ),
+                                    ),
+                                    const Gap(20.0),
+                                    OfferingWidget(isDark: isDark),
+                                    Packages(isDark: isDark),
+                                    const Gap(10.0),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0,
+                                        vertical: 8.0,
+                                      ),
+                                      child: _CustomButton(
+                                        title: "Buy Subscription",
+                                        onPressed: () {
+                                          if (state.selectedPackage != null) {
+                                            context.read<PurchasesBloc>().add(
+                                                  PurchaseSubscription(
+                                                      state.selectedPackage!),
+                                                );
+                                          } else {
+                                            Fluttertoast.showToast(
+                                              msg: "Select one package",
+                                              gravity: ToastGravity.BOTTOM,
+                                              backgroundColor: Colors.red,
+                                            );
+                                          }
+                                        },
+                                        isDark: isDark,
+                                      ),
+                                    ),
+                                    TextButton(
+                                      child: Text(
+                                        "Restore Purchases",
+                                        style: TextStyle(
+                                            color: AppColors.primaryColor),
+                                      ),
+                                      onPressed: () {
+                                        context
+                                            .read<PurchasesBloc>()
+                                            .add(RestoreSubscription());
+                                      },
+                                    ),
+                                    BillingInfoWidget(isDark: isDark),
+                                  ],
+                                ),
+                                if (state.isLoading)
+                                  Container(
+                                    padding: const EdgeInsets.all(20.0),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.cardColorTheme(isDark),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primaryColor,
+                                    ),
+                                  ),
+                                Positioned(
+                                  top: 10.0,
+                                  right: 10.0,
+                                  child: IconButton(
+                                    icon: Icon(
+                                      LucideIcons.x,
+                                      color: AppColors.textColor(isDark),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pushReplacement(
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation,
+                                                  secondaryAnimation) =>
+                                              const SaleOfferScreen(),
+                                          transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) =>
+                                              FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildCustomAppBar(bool isDark) {
-    return BlocBuilder<PurchasesBloc, PurchasesState>(
-      builder: (context, state) {
-        return FadeTransition(
-          opacity: _fadeAnimation,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    if (state.isSubscriptionActive) {
-                      Navigator.of(context).pop();
-                    } else {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                            builder: (context) => SaleOfferScreen()),
-                      );
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundColor(isDark)
-                          .withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.primaryColor.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Icon(
-                      LucideIcons.chevronLeft,
-                      color: AppColors.textColor(isDark),
-                      size: 20,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    'Premium Upgrade',
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textColor(isDark),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(width: 44), // Balance the back button
-              ],
+                          ),
+                  ],
+                );
+              },
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildAlreadySubscribedView(bool isDark) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: AnimatedBuilder(
-        animation: _floatingAnimation,
-        builder: (context, child) {
-          return Transform.translate(
-            offset: Offset(0, _floatingAnimation.value),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(30),
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.primaryColor,
-                        AppColors.primaryColor.withValues(alpha: 0.8),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(80),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryColor.withValues(alpha: 0.5),
-                        blurRadius: 40,
-                        spreadRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    LucideIcons.crown,
-                    color: AppColors.darkBackgroundColor,
-                    size: 60,
-                  ),
-                ),
-                const Gap(30),
-                ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [
-                      AppColors.textColor(isDark),
-                      AppColors.primaryColor,
-                    ],
-                  ).createShader(bounds),
-                  child: Text(
-                    "Welcome to Premium!",
-                    style: GoogleFonts.poppins(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textColor(isDark),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const Gap(15),
-                Text(
-                  "You're all set with unlimited access",
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: AppColors.greyColorTheme(isDark),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildPurchaseContent(PurchasesState state, bool isDark) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: AnimatedBuilder(
-        animation: _slideAnimation,
-        builder: (context, child) {
-          return Transform.translate(
-            offset: Offset(0, _slideAnimation.value),
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: [
-                const Gap(20),
-                _buildHeroSection(isDark),
-                const Gap(50),
-                Packages(isDark: isDark),
-                const Gap(30),
-                _buildPurchaseButton(state),
-                const Gap(20),
-                _buildRestoreButton(isDark),
-                const Gap(20),
-                BillingInfoWidget(isDark: isDark),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildHeroSection(bool isDark) {
-    return Container(
-      height: 150,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.primaryColor.withValues(alpha: 0.2),
-            AppColors.primaryColor.withValues(alpha: 0.1),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(
-          color: AppColors.primaryColor.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(14.0),
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                LucideIcons.sparkles,
-                color: AppColors.primaryColor,
-                size: 30,
-              ),
-            ),
-            const Gap(20),
-            Text(
-              'Unlock Premium Features',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textColor(isDark),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPurchaseButton(PurchasesState state) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primaryColor,
-            AppColors.primaryColor.withValues(alpha: 0.8),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(30.0),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withValues(alpha: 0.4),
-            blurRadius: 20,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () async {
-            if (state.selectedPackage != null) {
-              context
-                  .read<PurchasesBloc>()
-                  .add(PurchaseSubscription(state.selectedPackage!));
-            } else {
-              Fluttertoast.showToast(
-                msg: "Select one package",
-                gravity: ToastGravity.BOTTOM,
-                backgroundColor: Colors.red,
-              );
-            }
-          },
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 18),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  LucideIcons.creditCard,
-                  color: Colors.black,
-                  size: 24,
-                ),
-                const Gap(12),
-                Text(
-                  // state.selectedIndex == 0
-                  //     ? "Start Free Trial"
-                  //     : "Buy Subscription",
-                  "Buy Subscription",
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRestoreButton(bool isDark) {
-    return TextButton(
-      onPressed: () async {
-        context.read<PurchasesBloc>().add(RestoreSubscription());
-      },
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 15),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            LucideIcons.rotateCw,
-            color:
-                isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
-            size: 20,
-          ),
-          const Gap(8),
-          Text(
-            "Restore Purchases",
-            style: GoogleFonts.poppins(
-              color: isDark
-                  ? AppColors.primaryColor
-                  : AppColors.darkBackgroundColor,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoadingOverlay(bool isDark) {
-    return Container(
-      color: AppColors.backgroundColor(isDark).withValues(alpha: 0.8),
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.all(30),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.primaryColor.withValues(alpha: 0.2),
-                AppColors.primaryColor.withValues(alpha: 0.1),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppColors.primaryColor.withValues(alpha: 0.3),
-            ),
-          ),
-          child: const CustomLoadingWidget(),
-        ),
-      ),
     );
   }
 }
@@ -477,34 +178,21 @@ class Packages extends StatefulWidget {
   State<Packages> createState() => _PackagesState();
 }
 
-class _PackagesState extends State<Packages> with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
+class _PackagesState extends State<Packages> {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.elasticOut,
-    ));
-    _controller.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _selectInitialOffer();
+    });
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  void _selectInitialOffer() {
+    // Initial selection logic is handled in Bloc, but we can ensure here if needed
   }
 
   double calculateSavingsPercentage(double weeklyPrice, double yearlyPrice) {
+    if (weeklyPrice <= 0) return 0;
     double totalWeeklyCost = weeklyPrice * 52;
     double savings = 1 - (yearlyPrice / totalWeeklyCost);
     return savings * 100;
@@ -514,131 +202,107 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return BlocBuilder<PurchasesBloc, PurchasesState>(
       builder: (context, state) {
-        return ScaleTransition(
-          scale: _scaleAnimation,
-          child: Column(
-            children: _buildPackageOptions(context, state),
-          ),
-        );
+        if (state.offerings.isEmpty) {
+          if (state.cachedOffering != null) {
+            return _buildCachedPackages(
+                context, state.cachedOffering!, widget.isDark);
+          }
+          return SizedBox(
+            height: 200.0,
+            child: Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primaryColor,
+              ),
+            ),
+          );
+        }
+
+        final offering = state.offerings.first;
+        return _buildRealPackages(context, offering, state, widget.isDark);
       },
     );
   }
 
-  List<Widget> _buildPackageOptions(
-      BuildContext context, PurchasesState state) {
-    final widgets = <Widget>[];
+  Widget _buildRealPackages(BuildContext context, Offering offering,
+      PurchasesState state, bool isDark) {
+    final weekly = offering.weekly;
+    final annual = offering.annual;
 
-    if (state.offerings.isNotEmpty) {
-      for (final offers in state.offerings) {
-        final weekly = offers.weekly;
-        final annual = offers.annual;
-        final monthly = offers.monthly;
-
-        if (weekly != null) {
-          widgets.add(
-            PackagesWidgets(
-              title: "WEEKLY PLAN",
-              subtitle:
-                  "${weekly.storeProduct.currencyCode} ${weekly.storeProduct.price.toStringAsFixed(2)} / Week",
-              showTryForFree: false,
-              selectedPackage: state.selectedIndex == 0,
-              showPercentage: false,
-              isDark: widget.isDark,
-              onTap: () {
-                context.read<PurchasesBloc>().add(SelectPackage(weekly, 0));
-              },
-            ),
-          );
-        }
-
-        if (weekly != null && annual != null) {
-          widgets.add(const Gap(25));
-        }
-
-        if (annual != null) {
-          final percentage = calculateSavingsPercentage(
-            weekly?.storeProduct.price ?? 0.0,
-            annual.storeProduct.price,
-          ).toInt();
-          final oldPrice = monthly != null
-              ? "${annual.storeProduct.currencyCode} ${(monthly.storeProduct.price * 12).toStringAsFixed(2)}"
-              : null;
-          widgets.add(
-            PackagesWidgets(
-              title: "YEARLY PLAN",
-              subtitle:
-                  "${annual.storeProduct.currencyCode} ${annual.storeProduct.price.toStringAsFixed(2)} / Year",
-              oldPrice: oldPrice,
-              showTryForFree: false,
-              selectedPackage: state.selectedIndex == 1,
-              showPercentage: weekly != null,
-              percentage: percentage.toString(),
-              isDark: widget.isDark,
-              onTap: () {
-                context.read<PurchasesBloc>().add(SelectPackage(annual, 1));
-              },
-            ),
-          );
-        }
-      }
-      return widgets;
+    if (weekly == null || annual == null) {
+      return const SizedBox.shrink();
     }
 
-    final cached = state.cachedOffering;
-    if (cached != null) {
-      final weekly = cached.weekly;
-      final annual = cached.annual;
-      final monthly = cached.monthly;
+    int percentage = calculateSavingsPercentage(
+      weekly.storeProduct.price,
+      annual.storeProduct.price,
+    ).toInt();
 
-      if (weekly != null) {
-        widgets.add(
-          PackagesWidgets(
-            title: "WEEKLY PLAN",
-            subtitle: "${weekly.currencyCode} "
-                "${weekly.price.toStringAsFixed(2)} / Week",
-            showTryForFree: false,
-            selectedPackage: false,
-            showPercentage: false,
-            isDark: widget.isDark,
-            onTap: null,
-          ),
-        );
-      }
+    return Column(
+      children: [
+        PackagesWidgets(
+          title: "YEARLY PLAN",
+          subtitle: "${annual.storeProduct.priceString} per year",
+          showTryForFree: false,
+          selectedPackage: state.selectedIndex == 0,
+          showPercentage: true,
+          percentage: percentage.toString(),
+          isDark: isDark,
+          onTap: () {
+            context.read<PurchasesBloc>().add(SelectPackage(annual, 0));
+          },
+        ),
+        PackagesWidgets(
+          title: "WEEKLY PLAN",
+          subtitle: "${weekly.storeProduct.priceString} per week",
+          showTryForFree: false,
+          selectedPackage: state.selectedIndex == 1,
+          showPercentage: false,
+          isDark: isDark,
+          onTap: () {
+            context.read<PurchasesBloc>().add(SelectPackage(weekly, 1));
+          },
+        ),
+      ],
+    );
+  }
 
-      if (weekly != null && annual != null) {
-        widgets.add(const Gap(25));
-      }
+  Widget _buildCachedPackages(
+      BuildContext context, CachedOffering offering, bool isDark) {
+    final weekly = offering.weekly;
+    final annual = offering.annual;
 
-      if (annual != null) {
-        final percentage = weekly != null
-            ? calculateSavingsPercentage(weekly.price, annual.price).toInt()
-            : 0;
-        final oldPrice = monthly != null
-            ? "${annual.currencyCode} "
-                "${(monthly.price * 12).toStringAsFixed(2)}"
-            : null;
-
-        widgets.add(
-          PackagesWidgets(
-            title: "YEARLY PLAN",
-            subtitle: "${annual.currencyCode} "
-                "${annual.price.toStringAsFixed(2)} / Year",
-            oldPrice: oldPrice,
-            showTryForFree: false,
-            selectedPackage: false,
-            showPercentage: weekly != null,
-            percentage: percentage.toString(),
-            isDark: widget.isDark,
-            onTap: null,
-          ),
-        );
-      }
-
-      if (widgets.isNotEmpty) {
-        return widgets;
-      }
+    if (weekly == null || annual == null) {
+      return const SizedBox.shrink();
     }
-    return widgets;
+
+    int percentage = calculateSavingsPercentage(
+      weekly.price,
+      annual.price,
+    ).toInt();
+
+    return Column(
+      children: [
+        PackagesWidgets(
+          title: "YEARLY PLAN",
+          subtitle: "${annual.priceString} per year",
+          showTryForFree: false,
+          selectedPackage: false,
+          showPercentage: true,
+          percentage: percentage.toString(),
+          isDark: isDark,
+          onTap: () {},
+        ),
+        PackagesWidgets(
+          title: "WEEKLY PLAN",
+          subtitle: "${weekly.priceString} per week",
+          showTryForFree: false,
+          selectedPackage: false,
+          showPercentage: false,
+          isDark: isDark,
+          onTap: () {},
+        ),
+      ],
+    );
   }
 }
 
@@ -648,45 +312,61 @@ class OfferingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> benefits = [
+      "Unlimited Habits",
+      "Advanced Analytics",
+      "Detailed Calendar Views",
+      "Heatmap Views",
+      "Custom Themes",
+    ];
+
+    List<IconData> benefitsIcons = [
+      LucideIcons.infinity,
+      LucideIcons.barChart2,
+      LucideIcons.calendar,
+      LucideIcons.layoutGrid,
+      LucideIcons.palette,
+    ];
+
     return Column(
       children: [
-        ShaderMask(
-          shaderCallback: (bounds) => LinearGradient(
-            colors: [
-              AppColors.textColor(isDark),
-              AppColors.primaryColor,
-            ],
-          ).createShader(bounds),
-          child: Text(
-            'Upgrade to Premium',
-            style: GoogleFonts.poppins(
-              color: AppColors.textColor(isDark),
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+        Text(
+          'Upgrade to Premium',
+          style: TextStyle(
+            color: AppColors.textColor(isDark),
+            fontSize: 24.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const Gap(20.0),
+        Center(
+          child: IntrinsicWidth(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: benefits.asMap().entries.map((entry) {
+                int index = entry.key;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(benefitsIcons[index], color: AppColors.primaryColor),
+                      const Gap(10.0),
+                      Text(
+                        benefits[index],
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: AppColors.textColor(isDark),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ),
-        const Gap(15),
-        Container(
-          padding: const EdgeInsets.all(20),
-          margin: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            color: AppColors.cardColorTheme(isDark).withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(
-              color: AppColors.primaryColor.withValues(alpha: 0.2),
-            ),
-          ),
-          child: Text(
-            'Unlock unlimited habits, advanced analytics, detailed calendar views, custom themes and priority support',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              color: AppColors.greyColorTheme(isDark),
-              fontSize: 16,
-              height: 1.5,
-            ),
-          ),
-        ),
+        const Gap(10.0),
       ],
     );
   }
@@ -695,221 +375,133 @@ class OfferingWidget extends StatelessWidget {
 class PackagesWidgets extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String? oldPrice;
   final bool showTryForFree;
   final bool selectedPackage;
   final bool showPercentage;
   final String percentage;
+  final VoidCallback onTap;
   final bool isDark;
-  final VoidCallback? onTap;
 
   const PackagesWidgets({
     super.key,
     required this.title,
     required this.subtitle,
     required this.showTryForFree,
-    this.oldPrice,
     required this.selectedPackage,
     this.showPercentage = true,
     this.percentage = "",
+    required this.onTap,
     required this.isDark,
-    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          decoration: BoxDecoration(
-            gradient: selectedPackage
-                ? LinearGradient(
-                    colors: [
-                      AppColors.primaryColor.withValues(alpha: 0.2),
-                      AppColors.primaryColor.withValues(alpha: 0.1),
-                    ],
-                  )
-                : null,
-            color: selectedPackage
-                ? null
-                : (isDark
-                    ? AppColors.cardColorTheme(isDark).withValues(alpha: 0.05)
-                    : AppColors.cardColorTheme(isDark)),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: selectedPackage
-                  ? AppColors.primaryColor
-                  : (isDark
-                      ? AppColors.greyColorTheme(isDark).withValues(alpha: 0.3)
-                      : AppColors.greyColorTheme(isDark)),
-              width: selectedPackage ? 2 : (isDark ? 1 : 1.5),
-            ),
-            boxShadow: selectedPackage
-                ? [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withValues(alpha: 0.3),
-                      blurRadius: 15,
-                      spreadRadius: 2,
-                    ),
-                  ]
-                : null,
-          ),
-          child: Stack(
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.topRight,
             children: [
-              Column(
-                children: [
-                  if (showTryForFree)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: selectedPackage
-                              ? [
-                                  AppColors.primaryColor,
-                                  AppColors.primaryColor.withValues(alpha: 0.8),
-                                ]
-                              : [
-                                  AppColors.secondaryColorTheme(isDark),
-                                  AppColors.secondaryColorTheme(isDark)
-                                      .withValues(alpha: 0.8),
-                                ],
-                        ),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(18),
-                          topRight: Radius.circular(18),
-                        ),
-                      ),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: selectedPackage
+                      ? AppColors.primaryColor.withValues(alpha: 0.1)
+                      : AppColors.cardColorTheme(isDark),
+                  border: Border.all(
+                    color:
+                        selectedPackage ? AppColors.primaryColor : Colors.grey,
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(14.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            LucideIcons.gift,
-                            color: selectedPackage
-                                ? AppColors.darkBackgroundColor
-                                : AppColors.textColor(isDark),
-                            size: 16,
-                          ),
-                          const Gap(5),
-                          Text(
-                            "Try for free",
-                            style: GoogleFonts.poppins(
-                              color: selectedPackage
-                                  ? AppColors.darkBackgroundColor
-                                  : AppColors.textColor(isDark),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
                                 title,
-                                style: GoogleFonts.poppins(
+                                style: TextStyle(
                                   color: AppColors.textColor(isDark),
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 20,
+                                  fontSize: 18.0,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const Gap(8),
-                        Row(
-                          children: [
-                            if (oldPrice != null) ...[
                               Text(
-                                "$oldPrice ",
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.greyColorTheme(isDark),
-                                  decoration: TextDecoration.lineThrough,
-                                  decorationColor: AppColors.primaryColor,
-                                  decorationThickness: 2.0,
-                                  fontSize: 14,
+                                subtitle,
+                                style: TextStyle(
+                                  color: AppColors.textColor(isDark),
+                                  fontSize: 14.0,
                                 ),
                               ),
                             ],
-                            Text(
-                              subtitle,
-                              style: GoogleFonts.poppins(
-                                color: AppColors.textColor(isDark),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          ),
+                          const Spacer(),
+                          if (showPercentage)
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0,
+                                    vertical: 8.0,
+                                  ),
+                                  margin: const EdgeInsets.only(right: 10.0),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryColor,
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                  child: Text(
+                                    "Save $percentage%",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color:
+                                          isDark ? Colors.black : Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Gap(10.0),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              if (showPercentage)
-                Positioned(
-                  top: 10,
-                  right: 15,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.primaryColor,
-                          AppColors.primaryColor.withValues(alpha: 0.8),
+                          Container(
+                            height: 24.0,
+                            width: 24.0,
+                            decoration: BoxDecoration(
+                              color: selectedPackage
+                                  ? AppColors.primaryColor
+                                  : null,
+                              shape: BoxShape.circle,
+                              border: selectedPackage
+                                  ? null
+                                  : Border.all(color: Colors.grey, width: 2.0),
+                            ),
+                            child: selectedPackage
+                                ? Icon(
+                                    LucideIcons.check,
+                                    size: 16.0,
+                                    color: isDark ? Colors.black : Colors.white,
+                                  )
+                                : null,
+                          ),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primaryColor.withValues(alpha: 0.4),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        ),
-                      ],
                     ),
-                    child: Text(
-                      "Save $percentage%",
-                      style: GoogleFonts.poppins(
-                        color: AppColors.darkBackgroundColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-              if (selectedPackage)
-                Positioned(
-                  bottom: 20.0,
-                  right: 10.0,
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                        color: AppColors.primaryColor, shape: BoxShape.circle),
-                    child: Icon(
-                      LucideIcons.check,
-                      color: AppColors.darkBackgroundColor,
-                      size: 16,
-                    ),
-                  ),
-                ),
+              ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -932,72 +524,190 @@ class _BillingInfoWidgetState extends State<BillingInfoWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PurchasesBloc, PurchasesState>(
-      builder: (context, state) {
-        return Column(
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text(
-              // state.selectedIndex == 0
-              // ? state.offerings.isNotEmpty
-              // ? "3 days free trial, then ${state.offerings[0].monthly?.storeProduct.currencyCode} ${state.offerings[0].monthly?.storeProduct.price.toStringAsFixed(2)} / Month. Cancel anytime before trial ends."
-              // : ""
-              // :
-              "Auto renewable subscription. Cancel anytime from your account settings.",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                color: AppColors.greyColorTheme(widget.isDark),
-                fontSize: 13,
-                height: 1.4,
+            TextButton(
+              onPressed: () async {
+                _launchURL(
+                  "https://streaks2025.blogspot.com/2025/01/privacy-policy.html",
+                );
+              },
+              child: const Text(
+                "Privacy Policy",
+                style: TextStyle(color: AppColors.primaryColor),
               ),
             ),
-            const Gap(20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildLegalButton(
-                  "Privacy Policy",
-                  LucideIcons.shield,
-                  () => _launchURL(
-                    "https://streaks2025.blogspot.com/2025/01/privacy-policy.html",
-                  ),
-                  widget.isDark,
-                ),
-                _buildLegalButton(
-                  "Terms of Use",
-                  LucideIcons.fileText,
-                  () => _launchURL(
-                    "https://streaks2025.blogspot.com/2025/11/streaks-2025-terms-of-use.html",
-                  ),
-                  widget.isDark,
+            TextButton(
+              onPressed: () async {
+                await _launchURL(
+                  "https://streaks2025.blogspot.com/2025/11/streaks-2025-terms-of-use.html",
+                );
+              },
+              child: const Text(
+                "Terms of Use",
+                style: TextStyle(color: AppColors.primaryColor),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 30.0),
+      ],
+    );
+  }
+}
+
+class Subscribed extends StatelessWidget {
+  final bool isDark;
+  const Subscribed({super.key, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    List<String> benefits = [
+      "Unlimited Habits",
+      "Advanced Analytics",
+      "Detailed Calendar Views",
+      "Heatmap Views",
+      "Custom Themes",
+    ];
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              LucideIcons.crown,
+              color: AppColors.primaryColor,
+              size: 40,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            "🎉 Welcome to PRO!",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textColor(isDark),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "You now have access to all premium features",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Color(0xFF666666)),
+          ),
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.cardColorTheme(isDark),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryColor.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-          ],
-        );
-      },
+            child: Column(
+              children: benefits
+                  .map(
+                    (benefit) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            LucideIcons.checkCircle,
+                            color: AppColors.primaryColor,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              benefit,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: AppColors.textColor(isDark),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              foregroundColor: isDark ? Colors.black : Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 4,
+            ),
+            child: const Text(
+              "Start Exploring 🚀",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildLegalButton(
-      String text, IconData icon, VoidCallback onPressed, bool isDark) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      icon: Icon(
-        icon,
-        color: isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
-        size: 16,
-      ),
-      label: Text(
-        text,
-        style: GoogleFonts.poppins(
-          color:
-              isDark ? AppColors.primaryColor : AppColors.darkBackgroundColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+class _CustomButton extends StatelessWidget {
+  final String title;
+  final VoidCallback onPressed;
+  final bool isDark;
+
+  const _CustomButton({
+    required this.title,
+    required this.onPressed,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryColor,
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
         ),
-      ),
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18.0,
+          ),
+        ),
       ),
     );
   }

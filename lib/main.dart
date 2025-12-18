@@ -20,6 +20,13 @@ import 'package:streaks/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: AppColors.cardColor, // your primary color
+      statusBarIconBrightness: Brightness.dark, // icons = white
+      statusBarBrightness: Brightness.dark, // iOS
+    ),
+  );
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -41,8 +48,8 @@ class MyApp extends StatelessWidget {
       brightness: isDark ? Brightness.dark : Brightness.light,
       scaffoldBackgroundColor: AppColors.backgroundColor(isDark),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.primaryColor,
-        foregroundColor: AppColors.darkBackgroundColor, // Always black
+        backgroundColor: AppColors.cardColorTheme(isDark),
+        foregroundColor: AppColors.textColor(isDark), // Always black
         elevation: 0,
       ),
       textTheme: GoogleFonts.poppinsTextTheme(

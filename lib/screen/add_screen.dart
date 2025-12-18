@@ -36,8 +36,6 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   String selectedDaysPerWeek = "7";
   List<int> activeDays = [];
   int selectedColorCode = AppConstants.colors.first.toARGB32();
-  int selectedContainerColorCode =
-      AppConstants.primaryContainerColors.first.toARGB32();
   int currentIndex = 0;
   TimeOfDay? selectedTime;
 
@@ -45,46 +43,49 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   void initState() {
     context.read<PurchasesBloc>().add(TotalAddedStreaks(0));
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((value) {
-      _setSelectedTime();
-    });
+    if (widget.streak == null) {
+      WidgetsBinding.instance.addPostFrameCallback((value) {
+        _setSelectedTime();
+      });
+    }
   }
 
-  _setSelectedTime() {
+  void _setSelectedTime() {
     selectedTime = TimeOfDay.now();
     timeController.text = selectedTime?.format(context) ?? "";
   }
 
   @override
   void didChangeDependencies() {
-    activeDaysController.text = selectedDaysPerWeek;
-    if (widget.streak != null) {
-      nameController.text = widget.streak?.name ?? "";
-      selectedTime = TimeOfDay(
+    debugPrint(widget.streak?.daysOfWeek.first.toString() ?? "");
+    setState(() {
+      if (widget.streak != null) {
+        nameController.text = widget.streak?.name ?? "";
+        selectedTime = TimeOfDay(
           hour: widget.streak?.notificationHour ?? 0,
-          minute: widget.streak?.notificationMinute ?? 0);
-      timeController.text = TimeOfDay(
-              hour: widget.streak?.notificationHour ?? 0,
-              minute: widget.streak?.notificationMinute ?? 0)
-          .format(context);
-      selectedWeekDay = AppText.getDayOfWeek(widget.streak?.selectedWeek ?? 0);
-      selectedDaysPerWeek = widget.streak?.daysOfWeek.first ?? "";
-      activeDaysController.text = selectedDaysPerWeek;
-      activeDays.addAll(widget.streak?.selectedDays ?? []);
-      selectedWeekIndex = widget.streak?.selectedWeek ?? 0;
-      selectedColorCode = widget.streak!.colorCode;
-      selectedContainerColorCode = widget.streak!.containerColor;
-      context.read<IconBloc>().add(
-            UpdateSelectedIcon(
-              IconData(
-                widget.streak!.iconCode,
-                fontFamily: "Lucide",
-                fontPackage: 'lucide_icons',
+          minute: widget.streak?.notificationMinute ?? 0,
+        );
+        timeController.text = selectedTime?.format(context) ?? "";
+        selectedWeekDay =
+            AppText.getDayOfWeek(widget.streak?.selectedWeek ?? 0);
+        selectedDaysPerWeek = widget.streak?.daysOfWeek.first.toString() ?? "";
+        activeDaysController.text = selectedDaysPerWeek;
+        activeDays.addAll(widget.streak?.selectedDays ?? []);
+        selectedWeekIndex = widget.streak?.selectedWeek ?? 0;
+        selectedColorCode = widget.streak!.colorCode;
+        context.read<IconBloc>().add(
+              UpdateSelectedIcon(
+                IconData(
+                  widget.streak!.iconCode,
+                  fontFamily: "Lucide",
+                  fontPackage: 'lucide_icons',
+                ),
               ),
-            ),
-          );
-      setState(() {});
-    }
+            );
+      } else {
+        activeDaysController.text = selectedDaysPerWeek;
+      }
+    });
     super.didChangeDependencies();
   }
 
@@ -101,7 +102,6 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
             leading: IconButton(
               icon: Icon(
                 LucideIcons.chevronLeft,
-                color: AppColors.darkBackgroundColor,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -112,7 +112,6 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w700,
                 fontSize: 18.0,
-                color: AppColors.darkBackgroundColor,
               ),
             ),
             actions: [
@@ -133,7 +132,6 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                     },
                     icon: Icon(
                       LucideIcons.checkCircle,
-                      color: AppColors.darkBackgroundColor,
                     ),
                   );
                 },
@@ -413,7 +411,7 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
     );
   }
 
-  _errorDialog(String message) {
+  void _errorDialog(String message) {
     final isDark = context.read<ThemeBloc>().state is ThemeLoaded
         ? (context.read<ThemeBloc>().state as ThemeLoaded).isDark
         : true;
@@ -479,7 +477,6 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
       daysOfWeek: [selectedDaysPerWeek],
       colorCode: selectedColorCode,
       streakDates: widget.streak?.streakDates ?? [],
-      containerColor: selectedContainerColorCode,
       selectedWeek: selectedWeekIndex,
       iconCode: context.read<IconBloc>().state.selectedIcon.codePoint,
       selectedDays: activeDays,
@@ -508,7 +505,8 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
       "Habit",
       "Social",
       "Productivity",
-      "Sports",
+      "Health & Wellness",
+      "Lifestyle & Hobbies",
     ];
     showModalBottomSheet(
       backgroundColor: AppColors.secondaryColorTheme(isDark),
@@ -531,6 +529,7 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                       return SizedBox(
                         height: 40.0,
                         child: ListView.builder(
+                          padding: const EdgeInsets.only(right: 20.0),
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
                           itemCount: categories.length,
@@ -587,7 +586,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
                                     ? _socialIcons
                                     : state.currentIndex == 3
                                         ? _productivityIcons
-                                        : _sportsIcons,
+                                        : state.currentIndex == 4
+                                            ? _healthWellnessIcons
+                                            : _lifestyleHobbiesIcons,
                       );
                     },
                   ),
@@ -615,10 +616,9 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
           builder: (context) {
             return StreaksColors(
               initialColor: selectedColorCode,
-              onColorSelected: (colorCode, containerColorCode) {
+              onColorSelected: (colorCode) {
                 setState(() {
                   selectedColorCode = colorCode;
-                  selectedContainerColorCode = containerColorCode;
                 });
                 Navigator.pop(context);
               },
@@ -664,173 +664,678 @@ class _AddStrekScreenState extends State<AddStrekScreen> {
   }
 
   final List<IconData> _allIcons = [
-    LucideIcons.dumbbell,
-    LucideIcons.book,
-    LucideIcons.briefcase,
-    LucideIcons.camera,
-    LucideIcons.heart,
-    LucideIcons.music,
-    LucideIcons.star,
-    LucideIcons.bike,
-    LucideIcons.brush,
-    LucideIcons.calendar,
-    LucideIcons.car,
-    LucideIcons.checkCircle,
-    LucideIcons.clock,
-    LucideIcons.cloud,
-    LucideIcons.code,
-    LucideIcons.coffee,
-    LucideIcons.dollarSign,
-    LucideIcons.download,
-    LucideIcons.edit,
-    LucideIcons.eye,
-    LucideIcons.file,
-    LucideIcons.film,
-    LucideIcons.flag,
-    LucideIcons.flame,
-    LucideIcons.folder,
-    LucideIcons.gamepad,
-    LucideIcons.gift,
-    LucideIcons.globe,
-    LucideIcons.headphones,
-    LucideIcons.home,
-    LucideIcons.image,
-    LucideIcons.inbox,
-    LucideIcons.info,
-    LucideIcons.key,
-    LucideIcons.lightbulb,
-    LucideIcons.link,
-    LucideIcons.lock,
-    LucideIcons.mail,
-    LucideIcons.map,
-    LucideIcons.mic,
-    LucideIcons.monitor,
-    LucideIcons.moon,
-    LucideIcons.phone,
-    LucideIcons.pieChart,
-    LucideIcons.pin,
-    LucideIcons.play,
-    LucideIcons.plusCircle,
-    LucideIcons.pocket,
-    LucideIcons.printer,
-    LucideIcons.save,
-    LucideIcons.search,
-    LucideIcons.send,
-    LucideIcons.settings,
-    LucideIcons.shield,
-    LucideIcons.shoppingCart,
-    LucideIcons.smile,
-    LucideIcons.speaker,
-    LucideIcons.sun,
-    LucideIcons.tag,
-    LucideIcons.thermometer,
-    LucideIcons.trash,
-    LucideIcons.truck,
-    LucideIcons.tv,
-    LucideIcons.upload,
-    LucideIcons.user,
-    LucideIcons.video,
-    LucideIcons.volume,
-    LucideIcons.watch,
-    LucideIcons.wifi,
-    LucideIcons.zap,
-    // Add more icons as needed
+    ..._habitIcons,
+    ..._socialIcons,
+    ..._productivityIcons,
+    ..._healthWellnessIcons,
+    ..._lifestyleHobbiesIcons,
   ];
 
-  final List<IconData> _habitIcons = [
+  static final List<IconData> _habitIcons = [
+    // Exercise & Fitness
     LucideIcons.dumbbell,
-    LucideIcons.book,
+    LucideIcons.bike,
     LucideIcons.footprints,
+    LucideIcons.activity,
+    LucideIcons.heart,
+    LucideIcons.flame,
+    LucideIcons.trophy,
+    LucideIcons.target,
+    LucideIcons.zap,
+
+    // Learning & Reading
+    LucideIcons.book,
+    LucideIcons.bookOpen,
+    LucideIcons.graduationCap,
+    LucideIcons.brain,
+    LucideIcons.lightbulb,
+    LucideIcons.pencil,
+
+    // Sleep & Rest
     LucideIcons.bed,
+    LucideIcons.moon,
     LucideIcons.alarmClock,
     LucideIcons.sun,
+    LucideIcons.sunrise,
+    LucideIcons.sunset,
+
+    // Health & Wellness
     LucideIcons.glassWater,
     LucideIcons.utensils,
-    LucideIcons.monitorSmartphone,
-    LucideIcons.beer,
-    LucideIcons.cigarette,
-    LucideIcons.heart,
+    LucideIcons.apple,
+    LucideIcons.salad,
+    LucideIcons.pill,
+    LucideIcons.stethoscope,
+    LucideIcons.heartPulse,
+    LucideIcons.syringe,
+
+    // Mindfulness & Mental Health
+    LucideIcons.smile,
+    LucideIcons.brain,
+    LucideIcons.sparkles,
+    LucideIcons.wind,
+    LucideIcons.cloudy,
+
+    // Breaking Bad Habits
     LucideIcons.ban,
-    LucideIcons.layoutGrid,
-    LucideIcons.bike,
-    LucideIcons.brush,
-    LucideIcons.calendar,
-    LucideIcons.car,
-    LucideIcons.checkCircle,
-    LucideIcons.clock,
+    LucideIcons.cigarette,
+    LucideIcons.beer,
+    LucideIcons.monitorSmartphone,
+    LucideIcons.phoneOff,
+    LucideIcons.wifiOff,
+
+    // Productivity & Work
+    LucideIcons.briefcase,
     LucideIcons.code,
-    LucideIcons.coffee,
     LucideIcons.edit,
+    LucideIcons.checkCircle,
+    LucideIcons.listChecks,
+    LucideIcons.clipboard,
+
+    // Time Management
+    LucideIcons.clock,
+    LucideIcons.calendar,
+    LucideIcons.timer,
+    LucideIcons.hourglass,
+    LucideIcons.watch,
+
+    // Creative Activities
+    LucideIcons.brush,
+    LucideIcons.palette,
+    LucideIcons.music,
+    LucideIcons.mic,
+    LucideIcons.camera,
+    LucideIcons.video,
+
+    // Self-Care & Hygiene
+    LucideIcons.bath,
+    LucideIcons.droplet,
+    LucideIcons.sparkle,
+    LucideIcons.scissors,
+
+    // Finance & Savings
+    LucideIcons.dollarSign,
+    LucideIcons.piggyBank,
+    LucideIcons.wallet,
+    LucideIcons.coins,
+    LucideIcons.trendingUp,
+
+    // Social & Relationships
+    LucideIcons.users,
+    LucideIcons.user,
+    LucideIcons.phone,
+    LucideIcons.messageCircle,
+    LucideIcons.mail,
+
+    // Home & Chores
+    LucideIcons.home,
+    LucideIcons.recycle,
+    LucideIcons.leaf,
+
+    // Hobbies & Recreation
+    LucideIcons.gamepad,
+    LucideIcons.puzzle,
+    LucideIcons.coffee,
+    LucideIcons.flower,
+    LucideIcons.trees,
+
+    // Spiritual & Meditation
+    LucideIcons.church,
+    LucideIcons.candlestickChart,
+
+    // General
+    LucideIcons.star,
+    LucideIcons.flag,
+    LucideIcons.gift,
     LucideIcons.eye,
-    LucideIcons.flame,
+    LucideIcons.car,
+    LucideIcons.layoutGrid,
   ];
 
-  final List<IconData> _socialIcons = [
-    LucideIcons.activity,
-    LucideIcons.badgeCheck,
-    LucideIcons.heart,
-    LucideIcons.flame,
-    LucideIcons.dribbble,
+  static final List<IconData> _socialIcons = [
+    // Social Media
     LucideIcons.facebook,
     LucideIcons.instagram,
     LucideIcons.linkedin,
     LucideIcons.youtube,
-    LucideIcons.flag,
-    LucideIcons.messageCircle,
-    LucideIcons.rss,
-    LucideIcons.share2,
+    LucideIcons.twitter,
+    LucideIcons.github,
+    LucideIcons.gitlab,
+    LucideIcons.slack,
+    LucideIcons.dribbble,
+    LucideIcons.figma,
+    LucideIcons.twitch,
+
+    // Engagement
+    LucideIcons.heart,
     LucideIcons.thumbsUp,
     LucideIcons.thumbsDown,
-    LucideIcons.slack,
-    LucideIcons.smilePlus,
+    LucideIcons.messageCircle,
+    LucideIcons.messageSquare,
+    LucideIcons.share2,
+    LucideIcons.send,
+    LucideIcons.forward,
+    LucideIcons.reply,
+
+    // Activity & Status
+    LucideIcons.activity,
+    LucideIcons.flame,
+    LucideIcons.zap,
+    LucideIcons.trendingUp,
+    LucideIcons.badgeCheck,
+    LucideIcons.award,
+    LucideIcons.medal,
+    LucideIcons.crown,
+    LucideIcons.star,
+
+    // Communication
     LucideIcons.user,
+    LucideIcons.users,
+    LucideIcons.userPlus,
+    LucideIcons.userCheck,
+    LucideIcons.atSign,
+    LucideIcons.mail,
+    LucideIcons.phone,
+    LucideIcons.video,
+    LucideIcons.voicemail,
+
+    // Content
+    LucideIcons.image,
+    LucideIcons.camera,
+    LucideIcons.film,
+    LucideIcons.music,
+    LucideIcons.headphones,
+    LucideIcons.mic,
+    LucideIcons.rss,
+    LucideIcons.podcast,
+
+    // Interaction
+    LucideIcons.smilePlus,
+    LucideIcons.smile,
+    LucideIcons.laugh,
+    LucideIcons.meh,
+    LucideIcons.frown,
     LucideIcons.vote,
-    LucideIcons.stickyNote,
+    LucideIcons.flag,
+    LucideIcons.bookmark,
+    LucideIcons.eye,
+
+    // Organization
     LucideIcons.book,
+    LucideIcons.bookOpen,
+    LucideIcons.stickyNote,
+    LucideIcons.fileText,
+    LucideIcons.folderOpen,
+    LucideIcons.archive,
+
+    // Search & Discover
     LucideIcons.search,
     LucideIcons.scan,
-    // Add more social icons as needed
-  ];
-
-  final List<IconData> _productivityIcons = [
-    LucideIcons.briefcase,
-    LucideIcons.calendar,
-    LucideIcons.clock,
-    LucideIcons.code,
-    LucideIcons.edit,
-    LucideIcons.file,
-    LucideIcons.folder,
-    LucideIcons.inbox,
-    LucideIcons.key,
-    LucideIcons.lightbulb,
-    LucideIcons.lock,
-    LucideIcons.mail,
+    LucideIcons.compass,
+    LucideIcons.globe,
     LucideIcons.map,
-    LucideIcons.monitor,
-    LucideIcons.phone,
-    LucideIcons.pieChart,
-    LucideIcons.printer,
-    LucideIcons.save,
-    LucideIcons.search,
-    LucideIcons.send,
-    LucideIcons.settings,
-    LucideIcons.tag,
-    // Add more productivity icons as needed
+    LucideIcons.navigation,
+
+    // Notifications
+    LucideIcons.bell,
+    LucideIcons.bellRing,
+    LucideIcons.bellOff,
+    LucideIcons.inbox,
+
+    // Community
+    LucideIcons.partyPopper,
+    LucideIcons.gift,
+    LucideIcons.sparkles,
+    LucideIcons.trophy,
+    LucideIcons.target,
   ];
 
-  final List<IconData> _sportsIcons = [
+  static final List<IconData> _productivityIcons = [
+    // Work & Business
+    LucideIcons.briefcase,
+    LucideIcons.building,
+    LucideIcons.building2,
+    LucideIcons.store,
+
+    // Time Management
+    LucideIcons.calendar,
+    LucideIcons.calendarCheck,
+    LucideIcons.calendarClock,
+    LucideIcons.calendarDays,
+    LucideIcons.clock,
+    LucideIcons.timer,
+    LucideIcons.alarmClock,
+    LucideIcons.hourglass,
+    LucideIcons.watch,
+
+    // Tasks & Planning
+    LucideIcons.checkCircle,
+    LucideIcons.checkSquare,
+    LucideIcons.listChecks,
+    LucideIcons.clipboardCheck,
+    LucideIcons.clipboardList,
+    LucideIcons.clipboard,
+
+    // Documents & Files
+    LucideIcons.file,
+    LucideIcons.fileText,
+    LucideIcons.fileEdit,
+    LucideIcons.fileSpreadsheet,
+    LucideIcons.filePlus,
+    LucideIcons.folder,
+    LucideIcons.folderOpen,
+    LucideIcons.folderPlus,
+    LucideIcons.archive,
+
+    // Writing & Editing
+    LucideIcons.edit,
+    LucideIcons.pencil,
+    LucideIcons.penTool,
+    LucideIcons.highlighter,
+    LucideIcons.type,
+
+    // Communication
+    LucideIcons.mail,
+    LucideIcons.inbox,
+    LucideIcons.send,
+    LucideIcons.phone,
+    LucideIcons.phoneCall,
+    LucideIcons.messageSquare,
+    LucideIcons.messageCircle,
+    LucideIcons.video,
+
+    // Technology & Code
+    LucideIcons.code,
+    LucideIcons.monitor,
+    LucideIcons.laptop,
+    LucideIcons.terminal,
+    LucideIcons.database,
+    LucideIcons.server,
+    LucideIcons.cpu,
+    LucideIcons.hardDrive,
+
+    // Organization & Storage
+    LucideIcons.save,
+    LucideIcons.download,
+    LucideIcons.upload,
+    LucideIcons.cloud,
+    LucideIcons.box,
+
+    // Security & Privacy
+    LucideIcons.lock,
+    LucideIcons.unlock,
+    LucideIcons.key,
+    LucideIcons.shield,
+    LucideIcons.shieldCheck,
+    LucideIcons.fingerprint,
+    LucideIcons.eye,
+    LucideIcons.eyeOff,
+
+    // Search & Navigation
+    LucideIcons.search,
+    LucideIcons.filter,
+    LucideIcons.map,
+    LucideIcons.mapPin,
+    LucideIcons.navigation,
+    LucideIcons.compass,
+
+    // Settings & Tools
+    LucideIcons.settings,
+    LucideIcons.sliders,
+    LucideIcons.wrench,
+    LucideIcons.cog,
+
+    // Analytics & Charts
+    LucideIcons.pieChart,
+    LucideIcons.barChart,
+    LucideIcons.lineChart,
+    LucideIcons.trendingUp,
+    LucideIcons.trendingDown,
+    LucideIcons.activity,
+
+    // Ideas & Innovation
+    LucideIcons.lightbulb,
+    LucideIcons.brain,
+    LucideIcons.target,
+    LucideIcons.focus,
+    LucideIcons.zap,
+    LucideIcons.sparkles,
+
+    // Tags & Labels
+    LucideIcons.tag,
+    LucideIcons.tags,
+    LucideIcons.bookmark,
+    LucideIcons.pin,
+    LucideIcons.flag,
+
+    // Printing & Output
+    LucideIcons.printer,
+    LucideIcons.scan,
+    LucideIcons.copy,
+
+    // Links & Connections
+    LucideIcons.link,
+    LucideIcons.link2,
+    LucideIcons.unlink,
+    LucideIcons.share,
+    LucideIcons.share2,
+
+    // Finance & Money
+    LucideIcons.dollarSign,
+    LucideIcons.creditCard,
+    LucideIcons.wallet,
+    LucideIcons.receipt,
+    LucideIcons.calculator,
+
+    // Miscellaneous
     LucideIcons.award,
-    LucideIcons.gauge,
+    LucideIcons.trophy,
+    LucideIcons.medal,
+    LucideIcons.star,
+    LucideIcons.grid,
+    LucideIcons.layout,
+    LucideIcons.layers,
+    LucideIcons.package,
+  ];
+  static final List<IconData> _healthWellnessIcons = [
+    // Physical Health
+    LucideIcons.heart,
+    LucideIcons.heartPulse,
+    LucideIcons.heartHandshake,
+    LucideIcons.activity,
+
+    // Medical & Healthcare
+    LucideIcons.stethoscope,
+    LucideIcons.pill,
+    LucideIcons.syringe,
+    LucideIcons.thermometer,
+    LucideIcons.cross,
+
+    // Nutrition & Diet
+    LucideIcons.apple,
+    LucideIcons.salad,
+    LucideIcons.utensils,
+    LucideIcons.utensilsCrossed,
+    LucideIcons.soup,
+    LucideIcons.beef,
+    LucideIcons.candy,
+    LucideIcons.croissant,
+    LucideIcons.cookie,
+    LucideIcons.egg,
+    LucideIcons.fish,
+
+    // Hydration
+    LucideIcons.glassWater,
+    LucideIcons.droplet,
+    LucideIcons.droplets,
+    LucideIcons.cupSoda,
+    LucideIcons.milk,
+
+    // Exercise & Fitness
     LucideIcons.dumbbell,
     LucideIcons.bike,
-    LucideIcons.landmark,
+    LucideIcons.footprints,
+    LucideIcons.flame,
+    LucideIcons.zap,
+    LucideIcons.trophy,
+    LucideIcons.target,
+
+    // Sleep & Rest
+    LucideIcons.bed,
+    LucideIcons.bedDouble,
+    LucideIcons.moon,
+    LucideIcons.moonStar,
+
+    // Mental Health & Mindfulness
+    LucideIcons.brain,
+    LucideIcons.smile,
+    LucideIcons.smilePlus,
+    LucideIcons.laugh,
+    LucideIcons.meh,
+    LucideIcons.frown,
+    LucideIcons.sparkles,
+    LucideIcons.wind,
+    LucideIcons.cloudRain,
+    LucideIcons.sun,
+    LucideIcons.sunrise,
+    LucideIcons.sunset,
+
+    // Meditation & Relaxation
+    LucideIcons.flame,
+    LucideIcons.flower,
+    LucideIcons.flower2,
+    LucideIcons.music,
+    LucideIcons.headphones,
+    LucideIcons.volume2,
+
+    // Measurements & Tracking
+    LucideIcons.ruler,
+    LucideIcons.gauge,
+    LucideIcons.trendingUp,
+    LucideIcons.trendingDown,
+    LucideIcons.lineChart,
+    LucideIcons.barChart,
+    LucideIcons.activity,
+
+    // Body & Anatomy
+    LucideIcons.eye,
+    LucideIcons.ear,
+    LucideIcons.hand,
+    LucideIcons.footprints,
+    LucideIcons.accessibility,
+
+    // Hygiene & Self-Care
+    LucideIcons.bath,
+    LucideIcons.scissors,
+    LucideIcons.sparkle,
+    LucideIcons.droplet,
+
+    // Wellness Activities
+    LucideIcons.palmtree,
+    LucideIcons.umbrella,
+    LucideIcons.sunSnow,
+    LucideIcons.waves,
+    LucideIcons.tent,
+    LucideIcons.mountain,
+    LucideIcons.trees,
+    LucideIcons.leaf,
+
+    // Time & Scheduling
+    LucideIcons.clock,
+    LucideIcons.alarmClock,
+    LucideIcons.timer,
+    LucideIcons.calendar,
+    LucideIcons.calendarHeart,
+
+    // Goals & Progress
+    LucideIcons.award,
     LucideIcons.medal,
     LucideIcons.trophy,
-    LucideIcons.waves,
-    LucideIcons.treeDeciduous,
-    LucideIcons.sun,
+    LucideIcons.target,
+    LucideIcons.checkCircle,
+    LucideIcons.star,
+  ];
+
+  static final List<IconData> _lifestyleHobbiesIcons = [
+    // Entertainment & Gaming
+    LucideIcons.gamepad,
+    LucideIcons.gamepad2,
+    LucideIcons.joystick,
+    LucideIcons.dices,
+    LucideIcons.puzzle,
+    LucideIcons.swords,
+    LucideIcons.wand,
+    LucideIcons.wand2,
+
+    // Music & Audio
+    LucideIcons.music,
+    LucideIcons.music2,
+    LucideIcons.music3,
+    LucideIcons.music4,
+    LucideIcons.mic,
+    LucideIcons.mic2,
+    LucideIcons.headphones,
+    LucideIcons.speaker,
+    LucideIcons.volume,
+    LucideIcons.volume2,
+    LucideIcons.radio,
+    LucideIcons.podcast,
+
+    // Arts & Crafts
+    LucideIcons.brush,
+    LucideIcons.palette,
+    LucideIcons.paintbrush,
+    LucideIcons.paintbrush2,
+    LucideIcons.pipette,
+    LucideIcons.sparkles,
+    LucideIcons.wand,
+    LucideIcons.scissors,
+    LucideIcons.stamp,
+
+    // Photography & Video
+    LucideIcons.camera,
+    LucideIcons.cameraOff,
+    LucideIcons.video,
+    LucideIcons.videoOff,
+    LucideIcons.film,
+    LucideIcons.clapperboard,
+    LucideIcons.image,
+    LucideIcons.scan,
+
+    // Reading & Writing
+    LucideIcons.book,
+    LucideIcons.bookOpen,
+    LucideIcons.bookMarked,
+    LucideIcons.library,
+    LucideIcons.newspaper,
+    LucideIcons.scroll,
+    LucideIcons.pencil,
+    LucideIcons.feather,
+    LucideIcons.stickyNote,
+
+    // Cooking & Food
+    LucideIcons.chefHat,
+    LucideIcons.utensils,
+    LucideIcons.utensilsCrossed,
+    LucideIcons.soup,
+    LucideIcons.pizza,
+    LucideIcons.cake,
+    LucideIcons.croissant,
+    LucideIcons.coffee,
+    LucideIcons.cupSoda,
+    LucideIcons.wine,
+    LucideIcons.martini,
+
+    // Gardening & Nature
+    LucideIcons.flower,
+    LucideIcons.flower2,
     LucideIcons.leaf,
-    // Add more sports icons as needed
+    LucideIcons.leafyGreen,
+    LucideIcons.trees,
+    LucideIcons.sprout,
+    LucideIcons.palmtree,
+
+    // Travel & Adventure
+    LucideIcons.plane,
+    LucideIcons.planeTakeoff,
+    LucideIcons.planeLanding,
+    LucideIcons.car,
+    LucideIcons.bike,
+    LucideIcons.train,
+    LucideIcons.ship,
+    LucideIcons.sailboat,
+    LucideIcons.bus,
+    LucideIcons.map,
+    LucideIcons.mapPin,
+    LucideIcons.compass,
+    LucideIcons.globe,
+    LucideIcons.luggage,
+    LucideIcons.backpack,
+    LucideIcons.tent,
+    LucideIcons.mountain,
+    LucideIcons.mountainSnow,
+
+    // Sports & Outdoor Activities
+    LucideIcons.target,
+
+    // Shopping & Fashion
+    LucideIcons.shoppingCart,
+    LucideIcons.shoppingBag,
+    LucideIcons.store,
+    LucideIcons.shirt,
+    LucideIcons.wallet,
+    LucideIcons.creditCard,
+    LucideIcons.tag,
+    LucideIcons.ticket,
+    LucideIcons.gift,
+    LucideIcons.gem,
+    LucideIcons.diamond,
+    LucideIcons.watch,
+    LucideIcons.glasses,
+
+    // Home & DIY
+    LucideIcons.home,
+    LucideIcons.warehouse,
+    LucideIcons.hammer,
+    LucideIcons.wrench,
+    LucideIcons.paintBucket,
+    LucideIcons.ruler,
+    LucideIcons.package,
+
+    // Pets & Animals
+    LucideIcons.dog,
+    LucideIcons.cat,
+    LucideIcons.bird,
+    LucideIcons.fish,
+    LucideIcons.bug,
+    LucideIcons.squirrel,
+
+    // Parties & Celebrations
+    LucideIcons.partyPopper,
+    LucideIcons.cake,
+    LucideIcons.gift,
+    LucideIcons.sparkles,
+    LucideIcons.crown,
+
+    // Learning & Education
+    LucideIcons.graduationCap,
+    LucideIcons.school,
+    LucideIcons.microscope,
+    LucideIcons.beaker,
+    LucideIcons.atom,
+    LucideIcons.dna,
+
+    // Collecting & Hobbies
+    LucideIcons.stamp,
+    LucideIcons.coins,
+    LucideIcons.medal,
+    LucideIcons.award,
+    LucideIcons.trophy,
+    LucideIcons.archive,
+    LucideIcons.box,
+
+    // Technology & Gadgets
+    LucideIcons.smartphone,
+    LucideIcons.tablet,
+    LucideIcons.laptop,
+    LucideIcons.monitor,
+    LucideIcons.tv,
+    LucideIcons.radio,
+    LucideIcons.battery,
+    LucideIcons.usb,
+    LucideIcons.plug,
+
+    // Miscellaneous
+    LucideIcons.star,
+    LucideIcons.heart,
+    LucideIcons.flame,
+    LucideIcons.rocket,
+    LucideIcons.rainbow,
+    LucideIcons.umbrella,
+    LucideIcons.snowflake,
+    LucideIcons.sun,
+    LucideIcons.moon,
+    LucideIcons.cloud,
   ];
 }
 

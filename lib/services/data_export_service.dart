@@ -46,7 +46,7 @@ class DataExportService {
       // Convert streaks to JSON
       final packageInfo = await PackageInfo.fromPlatform();
       final exportData = {
-        'app': 'Streaks 2025-26',
+        'app': 'Streaks 2026',
         'version': packageInfo.version,
         'exportDate': DateTime.now().toIso8601String(),
         'streaks': streaks
@@ -60,7 +60,6 @@ class DataExportService {
                   'streakDates': streak.streakDates
                       .map((d) => d.toIso8601String())
                       .toList(),
-                  'containerColor': streak.containerColor,
                   'iconCode': streak.iconCode,
                   'selectedDays': streak.selectedDays,
                   'unlockedBadges': streak.unlockedBadges,
@@ -82,8 +81,8 @@ class DataExportService {
         ShareParams(
           files: [XFile(file.path)],
           text:
-              'My Streaks 2025-26 Backup\n\nExported on ${DateTime.now().toString().split('.')[0]}\nTotal streaks: ${streaks.length}',
-          subject: 'Streaks 2025-26 Backup',
+              'My Streaks 2026 Backup\n\nExported on ${DateTime.now().toString().split('.')[0]}\nTotal streaks: ${streaks.length}',
+          subject: 'Streaks 2026 Backup',
         ),
       );
 
@@ -190,7 +189,6 @@ class DataExportService {
             colorCode: streakMap['colorCode'] as int,
             selectedWeek: streakMap['selectedWeek'] as int,
             streakDates: dates,
-            containerColor: streakMap['containerColor'] as int,
             selectedDays: List<int>.from(streakMap['selectedDays'] as List),
             iconCode: streakMap['iconCode'] as int,
             unlockedBadges: streakMap['unlockedBadges'] != null

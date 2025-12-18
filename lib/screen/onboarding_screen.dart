@@ -47,7 +47,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       _OnboardingSlide(
         title: "Welcome to the streaks renaissance",
         description:
-            "Streaks 2025-26 is where ambitious routines turn into daily victories. "
+            "Streaks 2026 is where ambitious routines turn into daily victories. "
             "We craft the structure so you can focus on chasing the version of you that stays consistent, energized, and clear on the next micro-win.",
         highlights: [
           "Wake up to a gentle command center that celebrates yesterday and primes today's focus.",
@@ -163,7 +163,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Streaks 2025-26",
+                                "Streaks 2026",
                                 style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   letterSpacing: 1.5,

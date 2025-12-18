@@ -40,9 +40,11 @@ class PurchasesBloc extends Bloc<PurchasesEvent, PurchasesState> {
     if (info.activeSubscriptions.isNotEmpty) {
       await SharePrefsService.setSaleOfferBannerDismissed(true);
     }
+
+    bool active = info.activeSubscriptions.isNotEmpty;
     emit(
       state.copyWith(
-        isSubscriptionActive: info.activeSubscriptions.isNotEmpty,
+        isSubscriptionActive: active,
         isSubscriptionStatusLoaded: true,
       ),
     );

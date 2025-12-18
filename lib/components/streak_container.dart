@@ -305,6 +305,7 @@ class _StreakContainerState extends State<StreakContainer> {
             color: AppColors.cardColorTheme(isDark),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
+              side: BorderSide(color: AppColors.darkBorderColor),
             ),
             child: Container(
               padding: const EdgeInsets.all(12.0),
@@ -318,14 +319,31 @@ class _StreakContainerState extends State<StreakContainer> {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        IconData(
-                          widget.streak.iconCode,
-                          fontFamily: "Lucide",
-                          fontPackage: 'lucide_icons',
+                      Container(
+                        height: 42,
+                        width: 42,
+                        decoration: BoxDecoration(
+                          color: Color(widget.streak.colorCode)
+                              .withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            // BoxShadow(
+                            //   color: Color(widget.streak.colorCode)
+                            //       .withValues(alpha: 0.35),
+                            //   blurRadius: 12,
+                            //   spreadRadius: 1,
+                            // ),
+                          ],
                         ),
-                        size: 28.0,
-                        color: AppColors.textColor(isDark),
+                        child: Icon(
+                          IconData(
+                            widget.streak.iconCode,
+                            fontFamily: "Lucide",
+                            fontPackage: 'lucide_icons',
+                          ),
+                          size: 22,
+                          color: Color(widget.streak.colorCode),
+                        ),
                       ),
                       const Gap(14.0),
                       Column(
@@ -396,29 +414,33 @@ class _StreakContainerState extends State<StreakContainer> {
                             );
                           }
                         },
-                        child: Container(
-                          height: 35.0,
-                          width: 35.0,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          height: 38,
+                          width: 38,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Color(widget.streak.colorCode),
-                            ),
                             color: isTodayChecked
                                 ? Color(widget.streak.colorCode)
-                                : AppColors.backgroundColor(isDark),
+                                : Colors.transparent,
+                            border: Border.all(
+                              color: Color(widget.streak.colorCode),
+                              width: 2,
+                            ),
                           ),
                           child: Icon(
                             LucideIcons.check,
-                            size: 22.0,
-                            color: AppColors.backgroundColor(isDark),
+                            size: 18,
+                            color: isTodayChecked
+                                ? AppColors.backgroundColor(isDark)
+                                : Color(widget.streak.colorCode),
                           ),
                         ),
                       ),
                     ],
                   ),
                   Divider(
-                    color: AppColors.greyColorTheme(isDark).withAlpha(100),
+                    color: Color(0xFF2A313C),
                     height: 25.0,
                   ),
                   Row(
@@ -446,6 +468,9 @@ class _StreakContainerState extends State<StreakContainer> {
                             DateTime(d.year, d.month, d.day) == weekDayOnly);
                         bool isDayActive = widget.streak.selectedDays
                             .contains(reorderWeekdaysIndex[index]);
+                        bool isToday = weekDayOnly.day == today.day &&
+                            weekDayOnly.month == today.month &&
+                            weekDayOnly.year == today.year;
                         return Column(
                           children: [
                             Container(
@@ -461,6 +486,7 @@ class _StreakContainerState extends State<StreakContainer> {
                                 ),
                                 color: isDayChecked
                                     ? Color(widget.streak.colorCode)
+                                        .withValues(alpha: 0.15)
                                     : isDayActive
                                         ? Colors.transparent
                                         : AppColors.backgroundColor(isDark),
@@ -468,24 +494,15 @@ class _StreakContainerState extends State<StreakContainer> {
                               child: Center(
                                 child: isDayChecked
                                     ? Container(
-                                        height: 18.0,
-                                        width: 18.0,
+                                        height: 14.0,
+                                        width: 14.0,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: AppColors.blackColor
-                                              .withValues(alpha: 0.8),
+                                          color: Color(widget.streak.colorCode),
                                         ),
                                         child: Icon(
                                           LucideIcons.check,
-                                          color: isDayChecked
-                                              ? AppColors.whiteColor
-                                              : isDayActive
-                                                  ? Color(
-                                                      widget.streak.colorCode,
-                                                    )
-                                                  : AppColors.backgroundColor(
-                                                      isDark,
-                                                    ),
+                                          color: Color(widget.streak.colorCode),
                                           size: 10.0,
                                         ),
                                       )
@@ -495,7 +512,13 @@ class _StreakContainerState extends State<StreakContainer> {
                             Text(
                               reorderedWeeks[index],
                               style: GoogleFonts.poppins(
-                                  color: AppColors.textColor(isDark)),
+                                color: isToday
+                                    ? Color(widget.streak.colorCode)
+                                    : AppColors.textColor(isDark),
+                                fontWeight: isToday
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
                             ),
                           ],
                         );

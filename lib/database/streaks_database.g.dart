@@ -22,53 +22,48 @@ const StreakSchema = CollectionSchema(
       name: r'colorCode',
       type: IsarType.long,
     ),
-    r'containerColor': PropertySchema(
-      id: 1,
-      name: r'containerColor',
-      type: IsarType.long,
-    ),
     r'daysOfWeek': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'daysOfWeek',
       type: IsarType.stringList,
     ),
     r'iconCode': PropertySchema(
-      id: 3,
+      id: 2,
       name: r'iconCode',
       type: IsarType.long,
     ),
     r'name': PropertySchema(
-      id: 4,
+      id: 3,
       name: r'name',
       type: IsarType.string,
     ),
     r'notificationHour': PropertySchema(
-      id: 5,
+      id: 4,
       name: r'notificationHour',
       type: IsarType.long,
     ),
     r'notificationMinute': PropertySchema(
-      id: 6,
+      id: 5,
       name: r'notificationMinute',
       type: IsarType.long,
     ),
     r'selectedDays': PropertySchema(
-      id: 7,
+      id: 6,
       name: r'selectedDays',
       type: IsarType.longList,
     ),
     r'selectedWeek': PropertySchema(
-      id: 8,
+      id: 7,
       name: r'selectedWeek',
       type: IsarType.long,
     ),
     r'streakDates': PropertySchema(
-      id: 9,
+      id: 8,
       name: r'streakDates',
       type: IsarType.dateTimeList,
     ),
     r'unlockedBadges': PropertySchema(
-      id: 10,
+      id: 9,
       name: r'unlockedBadges',
       type: IsarType.longList,
     )
@@ -133,16 +128,15 @@ void _streakSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeLong(offsets[0], object.colorCode);
-  writer.writeLong(offsets[1], object.containerColor);
-  writer.writeStringList(offsets[2], object.daysOfWeek);
-  writer.writeLong(offsets[3], object.iconCode);
-  writer.writeString(offsets[4], object.name);
-  writer.writeLong(offsets[5], object.notificationHour);
-  writer.writeLong(offsets[6], object.notificationMinute);
-  writer.writeLongList(offsets[7], object.selectedDays);
-  writer.writeLong(offsets[8], object.selectedWeek);
-  writer.writeDateTimeList(offsets[9], object.streakDates);
-  writer.writeLongList(offsets[10], object.unlockedBadges);
+  writer.writeStringList(offsets[1], object.daysOfWeek);
+  writer.writeLong(offsets[2], object.iconCode);
+  writer.writeString(offsets[3], object.name);
+  writer.writeLong(offsets[4], object.notificationHour);
+  writer.writeLong(offsets[5], object.notificationMinute);
+  writer.writeLongList(offsets[6], object.selectedDays);
+  writer.writeLong(offsets[7], object.selectedWeek);
+  writer.writeDateTimeList(offsets[8], object.streakDates);
+  writer.writeLongList(offsets[9], object.unlockedBadges);
 }
 
 Streak _streakDeserialize(
@@ -153,16 +147,15 @@ Streak _streakDeserialize(
 ) {
   final object = Streak(
     colorCode: reader.readLong(offsets[0]),
-    containerColor: reader.readLong(offsets[1]),
-    daysOfWeek: reader.readStringList(offsets[2]) ?? [],
-    iconCode: reader.readLong(offsets[3]),
-    name: reader.readString(offsets[4]),
-    notificationHour: reader.readLong(offsets[5]),
-    notificationMinute: reader.readLong(offsets[6]),
-    selectedDays: reader.readLongList(offsets[7]) ?? [],
-    selectedWeek: reader.readLong(offsets[8]),
-    streakDates: reader.readDateTimeList(offsets[9]) ?? [],
-    unlockedBadges: reader.readLongList(offsets[10]),
+    daysOfWeek: reader.readStringList(offsets[1]) ?? [],
+    iconCode: reader.readLong(offsets[2]),
+    name: reader.readString(offsets[3]),
+    notificationHour: reader.readLong(offsets[4]),
+    notificationMinute: reader.readLong(offsets[5]),
+    selectedDays: reader.readLongList(offsets[6]) ?? [],
+    selectedWeek: reader.readLong(offsets[7]),
+    streakDates: reader.readDateTimeList(offsets[8]) ?? [],
+    unlockedBadges: reader.readLongList(offsets[9]),
   );
   object.id = id;
   return object;
@@ -178,24 +171,22 @@ P _streakDeserializeProp<P>(
     case 0:
       return (reader.readLong(offset)) as P;
     case 1:
-      return (reader.readLong(offset)) as P;
-    case 2:
       return (reader.readStringList(offset) ?? []) as P;
-    case 3:
+    case 2:
       return (reader.readLong(offset)) as P;
-    case 4:
+    case 3:
       return (reader.readString(offset)) as P;
+    case 4:
+      return (reader.readLong(offset)) as P;
     case 5:
       return (reader.readLong(offset)) as P;
     case 6:
-      return (reader.readLong(offset)) as P;
-    case 7:
       return (reader.readLongList(offset) ?? []) as P;
-    case 8:
+    case 7:
       return (reader.readLong(offset)) as P;
-    case 9:
+    case 8:
       return (reader.readDateTimeList(offset) ?? []) as P;
-    case 10:
+    case 9:
       return (reader.readLongList(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -378,59 +369,6 @@ extension StreakQueryFilter on QueryBuilder<Streak, Streak, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'colorCode',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<Streak, Streak, QAfterFilterCondition> containerColorEqualTo(
-      int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'containerColor',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<Streak, Streak, QAfterFilterCondition> containerColorGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'containerColor',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<Streak, Streak, QAfterFilterCondition> containerColorLessThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'containerColor',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<Streak, Streak, QAfterFilterCondition> containerColorBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'containerColor',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -1515,18 +1453,6 @@ extension StreakQuerySortBy on QueryBuilder<Streak, Streak, QSortBy> {
     });
   }
 
-  QueryBuilder<Streak, Streak, QAfterSortBy> sortByContainerColor() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'containerColor', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Streak, Streak, QAfterSortBy> sortByContainerColorDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'containerColor', Sort.desc);
-    });
-  }
-
   QueryBuilder<Streak, Streak, QAfterSortBy> sortByIconCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'iconCode', Sort.asc);
@@ -1598,18 +1524,6 @@ extension StreakQuerySortThenBy on QueryBuilder<Streak, Streak, QSortThenBy> {
   QueryBuilder<Streak, Streak, QAfterSortBy> thenByColorCodeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'colorCode', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Streak, Streak, QAfterSortBy> thenByContainerColor() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'containerColor', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Streak, Streak, QAfterSortBy> thenByContainerColorDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'containerColor', Sort.desc);
     });
   }
 
@@ -1693,12 +1607,6 @@ extension StreakQueryWhereDistinct on QueryBuilder<Streak, Streak, QDistinct> {
     });
   }
 
-  QueryBuilder<Streak, Streak, QDistinct> distinctByContainerColor() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'containerColor');
-    });
-  }
-
   QueryBuilder<Streak, Streak, QDistinct> distinctByDaysOfWeek() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'daysOfWeek');
@@ -1765,12 +1673,6 @@ extension StreakQueryProperty on QueryBuilder<Streak, Streak, QQueryProperty> {
   QueryBuilder<Streak, int, QQueryOperations> colorCodeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'colorCode');
-    });
-  }
-
-  QueryBuilder<Streak, int, QQueryOperations> containerColorProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'containerColor');
     });
   }
 

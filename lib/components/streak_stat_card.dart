@@ -23,6 +23,7 @@ class StreakStatCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.cardColorTheme(isDark),
+          border: Border.all(color: AppColors.darkBorderColor),
           borderRadius: BorderRadius.circular(AppConstants.borderRadius),
         ),
         child: Column(
@@ -73,4 +74,3 @@ class StreakStatCard extends StatelessWidget {
     );
   }
 }
-

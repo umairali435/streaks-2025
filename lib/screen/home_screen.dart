@@ -71,20 +71,21 @@ class _HomeScreenState extends State<HomeScreen>
         return Scaffold(
           backgroundColor: AppColors.backgroundColor(isDark),
           appBar: AppBar(
+            backgroundColor: AppColors.cardColorTheme(isDark),
             elevation: 0,
             centerTitle: true,
             title: Text(
-              "Streaks 2025-26",
+              "Streaks 2026",
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w900,
                 fontSize: 18.0,
-                color: AppColors.darkBackgroundColor,
+                color: AppColors.textColor(isDark),
               ),
             ),
             leading: IconButton(
               icon: Icon(
                 LucideIcons.settings,
-                color: AppColors.darkBackgroundColor,
+                color: AppColors.textColor(isDark),
               ),
               onPressed: () {
                 Navigator.of(context).push(
@@ -114,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen>
                     },
                     icon: Icon(
                       LucideIcons.crown,
-                      color: AppColors.darkBackgroundColor,
+                      color: AppColors.textColor(isDark),
                     ),
                   );
                 },
@@ -123,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen>
                 onPressed: _openAddHabit,
                 icon: Icon(
                   LucideIcons.plusSquare,
-                  color: AppColors.darkBackgroundColor,
+                  color: AppColors.textColor(isDark),
                 ),
               ),
             ],

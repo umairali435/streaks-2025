@@ -59,7 +59,7 @@ class ScreenshotService {
         ShareParams(
           files: [XFile(file.path)],
           text:
-              "🔥 Check out my streak progress! 💪\n\nJoin me and start building your own streaks with Streaks 2025-26! Download now and transform your habits into powerful streaks! 🚀",
+              "🔥 Check out my streak progress! 💪\n\nJoin me and start building your own streaks with Streaks 2026! Download now and transform your habits into powerful streaks! 🚀",
         ),
       );
     } catch (e) {

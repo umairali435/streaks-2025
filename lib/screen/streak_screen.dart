@@ -40,7 +40,7 @@ class _StreakScreenState extends State<StreakScreen> {
             elevation: 0,
             centerTitle: true,
             title: Text(
-              "Streaks 2025-26",
+              "Streaks 2026",
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w900,
                 fontSize: 18.0,

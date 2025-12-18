@@ -23,8 +23,6 @@ class Streak {
 
   late List<DateTime> streakDates;
 
-  late int containerColor;
-
   late int iconCode;
 
   late List<int> selectedDays;
@@ -39,7 +37,6 @@ class Streak {
     required this.colorCode,
     required this.streakDates,
     required this.selectedWeek,
-    required this.containerColor,
     required this.selectedDays,
     required this.iconCode,
     this.unlockedBadges,

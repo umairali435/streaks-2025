@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class AppConstants {
@@ -7,56 +6,45 @@ class AppConstants {
   static const double borderRadius = 8.0;
 
   static List<Color> colors = [
-    Color(0xFF00E676), // Bright Mint Green
-    Color(0xFF40C4FF), // Vivid Sky Blue
-    Color(0xFFFF4081), // Hot Pink
-    Color(0xFFFFD600), // Bright Yellow
-    Color(0xFF7C4DFF), // Electric Purple
-    Color(0xFF69F0AE), // Light Green
-    Color(0xFFFF5722), // Deep Orange
-    Color(0xFF1DE9B6), // Aqua Mint
-    Color(0xFFFFAB40), // Orange Accent
-    Color(0xFFFF5252), // Bright Red
-    Color(0xFF448AFF), // Bold Blue
-    Color(0xFFFFC400), // Neon Amber
-    Color(0xFF18FFFF), // Bright Cyan
-    Color(0xFF82B1FF), // Light Indigo
-    Color(0xFFFF6E40), // Neon Coral
-    Color(0xFF64FFDA), // Fresh Teal
-    Color(0xFF536DFE), // Indigo Accent
-    Color(0xFFFF8A80), // Soft Red
-    Color(0xFF00BFA5), // Emerald
-    Color(0xFFFFA726), // Bright Orange
-    Color(0xFF00B8D4), // Turquoise Blue
-    Color(0xFFFFC107), // Amber
-    Color(0xFFEA80FC), // Light Purple
-    Color(0xFFB9F6CA), // Mint Pastel
-  ];
-  static List<Color> primaryContainerColors = [
-    Color(0xFF1B1B1B), // Jet Black
-    Color(0xFF263238), // Blue Gray
-    Color(0xFF2E3A59), // Midnight Blue
-    Color(0xFF37474F), // Charcoal Gray
-    Color(0xFF1A237E), // Deep Indigo
-    Color(0xFF004D40), // Dark Teal
-    Color(0xFF3E2723), // Rich Brown
-    Color(0xFF311B92), // Dark Purple
-    Color(0xFF212121), // True Black
-    Color(0xFF263238), // Repeat for balance
-    Color(0xFF1C1C1C), // Near Black
-    Color(0xFF374151), // Slate Gray
-    Color(0xFF2C2C2C), // Muted Black
-    Color(0xFF1F2937), // Tailwind's Gray-800
-    Color(0xFF0F172A), // Deep Navy
-    Color(0xFF111827), // Cool Gray
-    Color(0xFF1A1A2E), // Ink Black
-    Color(0xFF2D2D44), // Grayish Navy
-    Color(0xFF242424), // Softened Black
-    Color(0xFF101010), // Almost pure black
-    Color(0xFF20232A), // Dark Mode Neutral
-    Color(0xFF1A202C), // Steel Gray
-    Color(0xFF171717), // True Dark
-    Color(0xFF111111), // UI Black
+    Color(0xFF5C7CFA),
+    Color(0xFF4D96FF),
+    Color(0xFF6B8CFF),
+    Color(0xFF2EE6D6),
+    Color(0xFF3DDC97),
+    Color(0xFF4FD1C5),
+    Color(0xFF9B8CFF),
+    Color(0xFFA78BFA),
+    Color(0xFF8B5CF6),
+    Color(0xFFFF8F6B),
+    Color(0xFFFF9F80),
+    Color(0xFFFF7A7A),
+    Color(0xFF9BE264),
+    Color(0xFF7ED957),
+    Color(0xFF6BCF9A),
+    Color(0xFF00E676),
+    Color(0xFF40C4FF),
+    Color(0xFFFF4081),
+    Color(0xFFFFD600),
+    Color(0xFF7C4DFF),
+    Color(0xFF69F0AE),
+    Color(0xFFFF5722),
+    Color(0xFF1DE9B6),
+    Color(0xFFFFAB40),
+    Color(0xFFFF5252),
+    Color(0xFF448AFF),
+    Color(0xFFFFC400),
+    Color(0xFF18FFFF),
+    Color(0xFF82B1FF),
+    Color(0xFFFF6E40),
+    Color(0xFF64FFDA),
+    Color(0xFF536DFE),
+    Color(0xFFFF8A80),
+    Color(0xFF00BFA5),
+    Color(0xFFFFA726),
+    Color(0xFF00B8D4),
+    Color(0xFFFFC107),
+    Color(0xFFEA80FC),
+    Color(0xFFB9F6CA),
   ];
 
   static int getWeekDay(DateTime date) {
@@ -163,20 +151,49 @@ class AppConstants {
 
   static String getRandomMotivationalMessage(String streakName) {
     final List<String> motivationalMessages = [
-      "🔥 You're on fire! Keep that $streakName streak alive – tap to check in now!",
-      "⏰ Just a minute a day keeps the streak alive! Tap to complete your $streakName streak!",
-      "🎯 Small steps, big results. Let’s crush your $streakName today!",
-      "🚀 Momentum is magic – don’t lose it! Complete your $streakName now!",
-      "🌟 Consistency creates success. Tap now and keep your $streakName going strong!",
-      "👣 One tap closer to your goals. Don’t break the $streakName streak!",
-      "🏁 You’re doing amazing – finish today’s $streakName and stay on track!",
-      "💪 Show up for yourself! Hit your $streakName goal today. Let’s go!",
-      "🧠 Your future self will thank you – log today’s $streakName progress!",
-      "✨ Greatness is built daily – keep your $streakName alive with just one tap!"
+      "You’re building something powerful. Keep your $streakName going today.",
+      "One small action is all it takes. Check in for your $streakName now.",
+      "Consistency beats motivation. Log today’s $streakName.",
+      "Don’t break the chain — your $streakName matters.",
+      "Progress happens when you show up. Complete your $streakName today.",
+      "Your future self is counting on this. Keep your $streakName alive.",
+      "Small steps today create big wins tomorrow. Tap to finish $streakName.",
+      "You’ve come this far — don’t stop now. Log your $streakName.",
+      "Momentum is built daily. Protect your $streakName streak.",
+      "Just one tap keeps your $streakName moving forward.",
+      "Success is quiet and consistent. Check in for $streakName.",
+      "Every streak starts with showing up. Finish today’s $streakName.",
+      "You’re proving you can stay consistent. Log $streakName now.",
+      "This is how habits stick. Complete your $streakName today.",
+      "You don’t need motivation — just action. Tap to log $streakName.",
+      "Even a small effort counts today. Keep your $streakName alive.",
+      "You’re building discipline one day at a time. Log $streakName.",
+      "Great things are built daily. Don’t skip your $streakName.",
+      "One check today makes tomorrow easier. Finish $streakName.",
+      "You’re closer than you think. Keep your $streakName going.",
+      "Habits shape your future. Log today’s $streakName.",
+      "Stay consistent. Stay proud. Complete your $streakName.",
+      "Discipline creates freedom. Check in for $streakName.",
+      "This is how progress is made. Finish today’s $streakName.",
+      "You’re showing up — that matters. Log $streakName now.",
+      "One day at a time builds real change. Keep $streakName alive.",
+      "Don’t let momentum slip. Complete your $streakName today.",
+      "Your effort today counts. Log your $streakName.",
+      "Small wins add up. Protect your $streakName streak.",
+      "You’re building a habit that builds you. Finish $streakName.",
+      "This is part of your routine now. Log $streakName.",
+      "Consistency is your advantage. Complete today’s $streakName.",
+      "You’ve got this. One tap for $streakName.",
+      "Keep showing up — it’s working. Log $streakName.",
+      "Habits grow stronger with repetition. Finish $streakName today.",
+      "You’re on the right track. Keep your $streakName alive.",
+      "Daily actions create lasting results. Log $streakName.",
+      "Stay steady. Stay consistent. Complete $streakName.",
+      "Your progress deserves recognition. Check in for $streakName.",
+      "One habit closer to your best self. Finish $streakName now.",
     ];
 
-    final math.Random random = math.Random();
-    int index = random.nextInt(motivationalMessages.length);
-    return motivationalMessages[index];
+    motivationalMessages.shuffle();
+    return motivationalMessages.first;
   }
 }

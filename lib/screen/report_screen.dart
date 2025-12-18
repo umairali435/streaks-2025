@@ -81,15 +81,11 @@ class ReportScreenState extends State<ReportScreen> {
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w900,
                 fontSize: 18.0,
-                color: AppColors.darkBackgroundColor,
               ),
             ),
             actions: [
               IconButton(
-                icon: Icon(
-                  LucideIcons.refreshCw,
-                  color: AppColors.darkBackgroundColor,
-                ),
+                icon: Icon(LucideIcons.refreshCw),
                 onPressed: _loadAnalytics,
               ),
             ],
@@ -1227,6 +1223,7 @@ class ReportScreenState extends State<ReportScreen> {
       decoration: BoxDecoration(
         color: AppColors.cardColorTheme(isDark),
         borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+        border: Border.all(color: AppColors.darkBorderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

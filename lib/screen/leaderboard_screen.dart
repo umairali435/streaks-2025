@@ -31,7 +31,6 @@ class LeaderboardScreen extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w900,
                 fontSize: 18.0,
-                color: AppColors.darkBackgroundColor,
               ),
             ),
             actions: [
@@ -41,7 +40,6 @@ class LeaderboardScreen extends StatelessWidget {
                     return IconButton(
                       icon: Icon(
                         LucideIcons.refreshCw,
-                        color: AppColors.darkBackgroundColor,
                       ),
                       onPressed: () {
                         context
@@ -277,7 +275,12 @@ class LeaderboardScreen extends StatelessWidget {
                       final entry = state.leaderboard[index];
                       final isCurrentUser = entry['userId'] == userId;
                       return _buildLeaderboardEntry(
-                          context, isDark, entry, index + 1, isCurrentUser);
+                        context,
+                        isDark,
+                        entry,
+                        index + 1,
+                        isCurrentUser,
+                      );
                     },
                   ),
                 ),
@@ -515,7 +518,7 @@ class LeaderboardScreen extends StatelessWidget {
     final totalStreaks = entry['totalStreaks'] as int;
     final totalCompletedStreaks = entry['totalCompletedStreaks'] as int;
     final String? displayName = entry['displayName'] as String?;
-    final photoUrl = entry['photoUrl'] as String?;
+    final isPremium = entry['isPremium'] as bool? ?? false;
 
     final nameInitial = displayName != null && displayName.isNotEmpty
         ? displayName.substring(0, 1).toUpperCase()
@@ -535,145 +538,182 @@ class LeaderboardScreen extends StatelessWidget {
       rankIcon = LucideIcons.trophy;
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isCurrentUser
-            ? AppColors.primaryColor.withValues(alpha: 0.2)
-            : AppColors.cardColorTheme(isDark),
-        borderRadius: BorderRadius.circular(12),
-        border: isCurrentUser
-            ? Border.all(
-                color: AppColors.primaryColor,
-                width: 2,
-              )
-            : null,
-      ),
-      child: Row(
-        children: [
-          // Rank
-          Container(
-            width: 40,
-            alignment: Alignment.center,
-            child: rank <= 3
-                ? Icon(
-                    rankIcon,
-                    color: rankColor,
-                    size: 24,
-                  )
-                : Text(
-                    '#$rank',
-                    style: GoogleFonts.poppins(
-                      color: AppColors.greyColorTheme(isDark),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-          ),
-          const Gap(12),
-          // Profile Picture
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 24,
-                child: Text(
-                  nameInitial,
-                  style: GoogleFonts.poppins(
-                    color: AppColors.textColor(isDark),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
+    return Stack(
+      children: [
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isCurrentUser
+                ? AppColors.primaryColor.withValues(alpha: 0.2)
+                : AppColors.cardColorTheme(isDark),
+            borderRadius: BorderRadius.circular(12),
+            border: isCurrentUser
+                ? Border.all(
                     color: AppColors.primaryColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.backgroundColor(isDark),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Center(
-                    child: Image.asset(
-                      LeaderboardService.getBadgeAssetPath(level),
-                      width: 16,
-                      height: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+                    width: 2,
+                  )
+                : null,
           ),
-          const Gap(12),
-          // User Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  displayName != null && displayName.isNotEmpty
-                      ? displayName
-                      : 'Anonymous',
-                  style: GoogleFonts.poppins(
-                    color: AppColors.textColor(isDark),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-                const Gap(4),
-                Row(
-                  children: [
-                    Icon(LucideIcons.target,
-                        size: 12, color: AppColors.greyColorTheme(isDark)),
-                    const Gap(4),
-                    Text(
-                      '$totalStreaks',
+          child: Row(
+            children: [
+              // Rank
+              Container(
+                width: 40,
+                alignment: Alignment.center,
+                child: rank <= 3
+                    ? Icon(
+                        rankIcon,
+                        color: rankColor,
+                        size: 24,
+                      )
+                    : Text(
+                        '#$rank',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.greyColorTheme(isDark),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+              ),
+              const Gap(12),
+              // Profile Picture
+              Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    child: Text(
+                      nameInitial,
                       style: GoogleFonts.poppins(
-                        color: AppColors.greyColorTheme(isDark),
-                        fontSize: 11,
+                        color: AppColors.textColor(isDark),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
-                    const Gap(12),
-                    Icon(LucideIcons.checkCircle2,
-                        size: 12, color: AppColors.greyColorTheme(isDark)),
-                    const Gap(4),
-                    Text(
-                      '$totalCompletedStreaks',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.greyColorTheme(isDark),
-                        fontSize: 11,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.backgroundColor(isDark),
+                          width: 1.5,
+                        ),
                       ),
+                      child: Center(
+                        child: Image.asset(
+                          LeaderboardService.getBadgeAssetPath(level),
+                          width: 16,
+                          height: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const Gap(12),
+              // User Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      displayName != null && displayName.isNotEmpty
+                          ? displayName
+                          : 'Anonymous',
+                      style: GoogleFonts.poppins(
+                        color: AppColors.textColor(isDark),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const Gap(4),
+                    Row(
+                      children: [
+                        Icon(LucideIcons.target,
+                            size: 12, color: AppColors.greyColorTheme(isDark)),
+                        const Gap(4),
+                        Text(
+                          '$totalStreaks',
+                          style: GoogleFonts.poppins(
+                            color: AppColors.greyColorTheme(isDark),
+                            fontSize: 11,
+                          ),
+                        ),
+                        const Gap(12),
+                        Icon(LucideIcons.checkCircle2,
+                            size: 12, color: AppColors.greyColorTheme(isDark)),
+                        const Gap(4),
+                        Text(
+                          '$totalCompletedStreaks',
+                          style: GoogleFonts.poppins(
+                            color: AppColors.greyColorTheme(isDark),
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          // Level Badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.secondaryColorTheme(isDark),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              'Lv.$level',
-              style: GoogleFonts.poppins(
-                color: AppColors.textColor(isDark),
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
               ),
-            ),
+              // Level Badge
+              Row(
+                children: [
+                  if (isPremium)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrange.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            LucideIcons.crown,
+                            color: Colors.deepOrange,
+                            size: 16,
+                          ),
+                          const Gap(4),
+                          Text(
+                            'Pro',
+                            style: GoogleFonts.poppins(
+                              color: Colors.deepOrange,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  Gap(8.0),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondaryColorTheme(isDark),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Lv.$level',
+                      style: GoogleFonts.poppins(
+                        color: AppColors.textColor(isDark),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

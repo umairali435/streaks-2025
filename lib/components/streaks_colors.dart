@@ -3,7 +3,7 @@ import 'package:streaks/res/constants.dart';
 
 class StreaksColors extends StatefulWidget {
   final int? initialColor;
-  final Function(int selectedPrimary, int selectedContainer) onColorSelected;
+  final Function(int selectedPrimary) onColorSelected;
 
   const StreaksColors({
     super.key,
@@ -39,8 +39,8 @@ class _StreaksColorsState extends State<StreaksColors> {
             setState(() {
               selectedColorCode = AppConstants.colors[index].toARGB32();
             });
-            widget.onColorSelected(AppConstants.colors[index].toARGB32(),
-                AppConstants.primaryContainerColors[index].toARGB32());
+            widget.onColorSelected(
+                selectedColorCode ?? AppConstants.colors[index].toARGB32());
           },
           child: Stack(
             alignment: Alignment.center,

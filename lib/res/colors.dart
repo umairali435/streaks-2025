@@ -7,11 +7,13 @@ class AppColors {
   static const Color primaryColor = Color(0xFFb8ea6c);
 
   // Dark theme colors
-  static const Color darkBackgroundColor = Color(0xFF121212);
+  static const Color darkBackgroundColor = Color(0xFF0E1116);
   static const Color darkSecondaryColor = Color(0xFF313747);
-  static const Color darkTextColor = Color(0xFFF2F9FF);
-  static const Color darkCardColor = Color(0xFF21242b);
+  static const Color darkTextColor = Color(0xFFE9EEF3);
+  static const Color darkCardColor = Color(0xFF181D24);
   static const Color darkGreyColor = Color(0xFFBFCFE7);
+
+  static const Color darkBorderColor = Color(0xFF232A33);
 
   // Light theme colors
   static const Color lightBackgroundColor = Color(0xFFF5F5F5);

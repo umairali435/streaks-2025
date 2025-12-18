@@ -77,7 +77,6 @@ class ProfileScreenState extends State<ProfileScreen> {
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w900,
                 fontSize: 18.0,
-                color: AppColors.darkBackgroundColor,
               ),
             ),
             actions: [
@@ -85,7 +84,6 @@ class ProfileScreenState extends State<ProfileScreen> {
                 IconButton(
                   icon: Icon(
                     LucideIcons.refreshCw,
-                    color: AppColors.darkBackgroundColor,
                   ),
                   onPressed: _loadProfileData,
                 ),
